@@ -88,7 +88,9 @@ function compare(messageChannel, author) {
   var missingSteamID = "";
   voiceChannel.members.array().forEach( user => {
     if (users[user.user.id]) {
-      promises.push(steam.getUserOwnedGames(users[user.user.id]));
+      promises.push(steam.getUserOwnedGames(users[user.user.id]).then( games => {
+        return {games: games, user: user.user.id}
+      }));
     } else {
       missingSteamID += user.user.username + ", ";
     }
@@ -100,31 +102,41 @@ function compare(messageChannel, author) {
 
   Promise.all(
     promises
-  ).then( response => {
+  ).then( responses => {
     var games = [];
-    response[0].forEach( game => {
-      games.push({id: game.appID, name: game.name})
+    responses[0].games.forEach( game => {
+      games.push({id: game.appID, name: game.name, owners: []})
     });
 
-    response.forEach( usersGames => {
+    responses.forEach( response => {
       var tempGames = [];
-      usersGames.forEach( game => {
+      response.games.forEach( game => {
         games.forEach( gameInList => {
           if (gameInList.id === game.appID) {
-            tempGames.push({id: game.appID, name: game.name});
+            gameInList.owners.push(response.user);
+            tempGames.push({id: game.appID, name: game.name, owners: gameInList.owners});
           }
         })
-      })
+      });
 
       games = tempGames;
     });
 
-    var gamesString = ""
+    if (games.length < 1) {
+      return
+    }
+
+    var ownersString = "";
+    games[0].owners.forEach( owner => {
+      ownersString += "<@" + owner + ">, "
+    });
+
+    var gamesString = "";
     games.forEach( game => {
       gamesString += game.name + ", "
     });
 
-    messageChannel.send("You have " + games.length + " games in common: " + gamesString);
+    messageChannel.send(ownersString + " have " + games.length + " games in common: " + gamesString);
   });
 }
 
