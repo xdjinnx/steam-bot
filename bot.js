@@ -36,9 +36,14 @@ client.on('message', event => {
         compare(channel, author);
         break;
       case 'add':
-        add(channel, author, args[1]);
+        add(channel, author, args[1], args[2]);
         break;
-        // Just add any case commands if you want to..
+      case 'bot-users':
+        displayBotUsers(channel);
+        break;
+      case 'discord-users':
+        displayDiscordUsers(channel);
+        break;
       default:
         channel.send("Sorry can't understand: " + "'" + cmd +"'");
     }
@@ -49,19 +54,35 @@ client.login("NjgwODk0NTIzODQwNTI4NDA3.XlHRTg.5vGd1X-3o4-3SHK8bvoIQsnSwwQ").then
 
 var users = {};
 
-function add(channel, author, steamID) {
-  logger.info(author.id + " : " + steamID);
+function add(channel, author, steamID, discordUserID) {
+  var userId = discordUserID || author.id;
+  var username = author.username;
+
+  channel.members.array().forEach( user => {
+    if (user.user.id === userId) {
+      username = user.user.username;
+    }
+  });
+
+  logger.info(userId + " : " + steamID);
   steam.getUserSummary(steamID).then( summery => {
-    users[author.id] = steamID;
+    users[userId] = {
+      id: userId,
+      username: username,
+      steamID: steamID,
+      steamName: summery.nickname
+    };
 
     permissionCheck(steamID).then( error => {
       var problem = "";
       if (error) {
-        problem = "But the user seems to have permission issues!";
+        problem = "The steam user seems to have permission issues!";
       }
 
       channel.send("Thank you " + author.username + ", I have added: " + summery.nickname + "! " + problem);
     })
+  }, error => {
+    channel.send("Steam ID provided is invalid");
   });
 }
 
@@ -88,7 +109,7 @@ function compare(messageChannel, author) {
   var missingSteamID = "";
   voiceChannel.members.array().forEach( user => {
     if (users[user.user.id]) {
-      promises.push(steam.getUserOwnedGames(users[user.user.id]).then( games => {
+      promises.push(steam.getUserOwnedGames(users[user.user.id].steamID).then( games => {
         return {games: games, user: user.user.id}
       }));
     } else {
@@ -138,6 +159,27 @@ function compare(messageChannel, author) {
 
     messageChannel.send(ownersString + " have " + games.length + " games in common: " + gamesString);
   });
+}
+
+function displayBotUsers(channel) {
+  var message ="";
+
+  const keys = Object.keys(users);
+  keys.forEach(key => {
+    message += users[key].username + ":" + users[key].steamID + ", "
+  })
+
+  channel.send(message)
+}
+
+function displayDiscordUsers(channel) {
+  var message = "";
+
+  channel.members.array().forEach( user => {
+    message += user.user.username + ":" + user.user.id + ", ";
+  });
+
+  channel.send(message)
 }
 
 function permissionCheck(steamID) {
