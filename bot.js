@@ -5,6 +5,9 @@ var logger = require('winston');
 const SteamAPI = require("steamapi");
 const steam = new SteamAPI("8C1444D72335D5A78A543DBB1CDE6A91");
 
+var sqlite3 = require('sqlite3').verbose();
+var db = new sqlite3.Database('./db.sql');
+
 // Configure logger settings
 logger.remove(logger.transports.Console);
 logger.add(new logger.transports.Console, {
