@@ -20,8 +20,6 @@ client.on('ready', () => {
   logger.info('Logged in as: ');
 });
 client.on('message', event => {
-  logger.info(message)
-
   var channel = event.channel;
   var author = event.author;
   var message = event.content;
