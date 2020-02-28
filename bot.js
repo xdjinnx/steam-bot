@@ -53,8 +53,6 @@ client.on('message', event => {
 
 client.login("NjgwODk0NTIzODQwNTI4NDA3.XlHRTg.5vGd1X-3o4-3SHK8bvoIQsnSwwQ").then();
 
-var users = {};
-
 function add(channel, author, steamID, discordUserID) {
   var userId = discordUserID || author.id;
   var username = author.username;
@@ -67,12 +65,16 @@ function add(channel, author, steamID, discordUserID) {
 
   logger.info(userId + " : " + steamID);
   steam.getUserSummary(steamID).then( summery => {
-    users[userId] = {
-      id: userId,
-      username: username,
-      steamID: steamID,
-      steamName: summery.nickname
-    };
+    db.serialize(function() {
+      var stmt = db.prepare("INSERT INTO User (id, username, steam_id, steam_name) VALUES (?, ?, ?, ?)");
+      stmt.run(
+        userId,
+        username,
+        steamID,
+        summery.nickname
+      );
+      stmt.finalize();
+    });
 
     permissionCheck(steamID).then( error => {
       var problem = "";
@@ -105,6 +107,9 @@ function compare(messageChannel, author) {
     messageChannel.send("Sorry you are not in a voice channel");
     return
   }
+
+  //var stmt = db.prepare("SELECT * FROM User WHERE id IN (?)");
+  //stmt.each("");
 
   var promises = [];
   var missingSteamID = "";
@@ -165,12 +170,11 @@ function compare(messageChannel, author) {
 function displayBotUsers(channel) {
   var message ="";
 
-  const keys = Object.keys(users);
-  keys.forEach(key => {
-    message += users[key].username + ":" + users[key].steamID + ", "
-  })
-
-  channel.send(message)
+  db.each("SELECT username, steam_id FROM User", function(err, row) {
+    message += row.username + ":" + row.steam_id + ", "
+  }, function() {
+    channel.send(message)
+  });
 }
 
 function displayDiscordUsers(channel) {
