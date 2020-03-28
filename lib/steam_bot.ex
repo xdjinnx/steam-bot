@@ -53,5 +53,16 @@ defmodule SteamBot.Application do
     run = Client.start("NjgwODk0NTIzODQwNTI4NDA3.XlHRTg.5vGd1X-3o4-3SHK8bvoIQsnSwwQ")
     use Commands
     run
+
+    import Supervisor.Spec, warn: false
+
+    children = [
+      Repo,
+    ]
+
+    opts = [strategy: :one_for_one, name: SteamBot.Supervisor]
+    Supervisor.start_link(children, opts)
+
+
   end
 end

@@ -13,14 +13,16 @@ defmodule SteamBot.MixProject do
 
   def application do
     [
-      extra_applications: [:logger],
+      extra_applications: [:logger, :sqlite_ecto2, :ecto],
       mod: {SteamBot.Application, []}
     ]
   end
 
   defp deps do
     [
-      {:alchemy, "~> 0.6.4", hex: :discord_alchemy}
+      {:alchemy, "~> 0.6.4", hex: :discord_alchemy},
+      {:sqlite_ecto2, "~> 2.2"},
+      {:poison, "~> 4.0", override: true}
     ]
   end
 end

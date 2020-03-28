@@ -6,7 +6,13 @@ defmodule Func do
   end
 
   def add(member, arg1) do
-    ''
+    case Integer.parse(arg1) do
+      {steam_id, _} -> case Query.insert_user(%User{steam_id: steam_id}) do
+        {:ok, _} -> 'Thank you %{discord_name}, I have added: %{steam_name}!'
+        {:error, _} -> 'Something went wrong'
+      end
+      :error -> 'not a valid steam id'
+    end
   end
 
   def add(member, arg1, arg2) do
@@ -22,6 +28,6 @@ defmodule Func do
   end
 
   def botUsers do
-    'not implemented'
+    Query.get_all_users()
   end
 end
