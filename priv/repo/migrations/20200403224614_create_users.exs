@@ -6,7 +6,7 @@ defmodule Repo.Migrations.CreateUsers do
       add :discord_name, :string
       add :steam_name, :string
       add :discord_id, :integer
-      add :steam_id, :integer
+      add :steam_id, :string
       timestamps()
     end
   end

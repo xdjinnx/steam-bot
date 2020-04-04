@@ -22,7 +22,8 @@ defmodule SteamBot.MixProject do
     [
       {:alchemy, "~> 0.6.4", hex: :discord_alchemy},
       {:sqlite_ecto2, "~> 2.2"},
-      {:poison, "~> 4.0", override: true}
+      {:poison, "~> 4.0", override: true},
+      {:steam_ex, "~> 0.2.0-alpha"}
     ]
   end
 end

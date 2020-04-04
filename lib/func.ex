@@ -6,18 +6,23 @@ defmodule Func do
   end
 
   def add(member, arg1) do
-    case Integer.parse(arg1) do
-      {steam_id, _} -> case Query.insert_user(%User{steam_id: steam_id}) do
-        {:ok, _} -> 'Thank you %{discord_name}, I have added: %{steam_name}!'
-        {:error, _} -> 'Something went wrong'
-      end
-      :error -> 'not a valid steam id'
-    end
+    Steam.get_user(arg1)
+    |> insert_user
+    |> add_response
   end
 
   def add(member, arg1, arg2) do
     'not implemented'
   end
+
+  defp insert_user(steam_user), do: Query.insert_user(%User{
+    steam_name: steam_user["personaname"],
+    steam_id: steam_user["steamid"]
+  })
+
+  defp add_response({:ok, user}), do: "Thank you %{discord_name}, I have added: #{user.steam_name}!"
+
+  defp add_response({:error, _}), do: 'Something went wrong'
 
   def compare(member) do
     'not implemented'
