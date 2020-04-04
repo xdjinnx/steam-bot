@@ -37,9 +37,21 @@ defmodule Func do
     Discord.get_members_in_voice_channel(guild_id, channel_id)
     |> get_registered_users
     |> Enum.map(fn user -> {user, Steam.get_owned_games(user.steam_id)} end)
+    |> compare_games
 
-    # |> List.diff TODO: Make a diff for each user
     # |> Create response
+  end
+
+  defp compare_games(users_games) do
+    {_, games} = List.first(users_games)
+
+    List.foldl(users_games, games, fn {_, games}, acc ->
+      Enum.filter(acc, fn {_, game} -> is_game_in_list?(games, game) end)
+    end)
+  end
+
+  defp is_game_in_list?(games, game) do
+    Enum.any?(games, fn games_game -> games_game["appid"] == game["appid"] end)
   end
 
   defp get_registered_users(guild_members) do
