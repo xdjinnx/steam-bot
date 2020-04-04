@@ -4,7 +4,7 @@ defmodule User do
   schema "users" do
     field :discord_name, :string
     field :steam_name, :string
-    field :discord_id, :integer
+    field :discord_id, :string
     field :steam_id, :string
     timestamps()
   end
