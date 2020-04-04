@@ -17,24 +17,29 @@ defmodule Func do
     add({:ok, guild_member}, steam_id)
   end
 
-  defp insert_user(steam_user, discord_user), do: Query.insert_user(%User{
-    discord_id: discord_user.id,
-    discord_name: discord_user.username,
-    steam_name: steam_user["personaname"],
-    steam_id: steam_user["steamid"]
-  })
+  defp insert_user(steam_user, discord_user),
+    do:
+      Query.insert_user(%User{
+        discord_id: discord_user.id,
+        discord_name: discord_user.username,
+        steam_name: steam_user["personaname"],
+        steam_id: steam_user["steamid"]
+      })
 
-  defp add_response({:ok, user}), do: "#{user.discord_name} has been connected to steam user #{user.steam_name}!"
+  defp add_response({:ok, user}),
+    do: "#{user.discord_name} has been connected to steam user #{user.steam_name}!"
 
   defp add_response({:error, _}), do: 'Something went wrong when writing to database'
 
   def compare({:ok, guild_member}, {:ok, guild_id}) do
     channel_id = Discord.get_current_voice_channel(guild_id, guild_member.user.id)
+
     Discord.get_members_in_voice_channel(guild_id, channel_id)
     |> get_registered_users
     |> Enum.map(fn user -> {user, Steam.get_owned_games(user.steam_id)} end)
-    #|> List.diff TODO: Make a diff for each user
-    #|> Create response
+
+    # |> List.diff TODO: Make a diff for each user
+    # |> Create response
   end
 
   defp get_registered_users(guild_members) do
@@ -45,11 +50,15 @@ defmodule Func do
 
   def discord_users({:ok, guild_id}) do
     Discord.get_members(guild_id)
-    |> List.foldl("", fn guild_member, acc -> acc <> "#{guild_member.user.username}:#{guild_member.user.id}, " end)
+    |> List.foldl("", fn guild_member, acc ->
+      acc <> "#{guild_member.user.username}:#{guild_member.user.id}, "
+    end)
   end
 
   def bot_users do
     Query.get_all_users()
-    |> List.foldl("", fn user, acc -> acc <> "#{user.discord_name}: #{user.steam_name}(#{user.steam_id}), " end)
+    |> List.foldl("", fn user, acc ->
+      acc <> "#{user.discord_name}: #{user.steam_name}(#{user.steam_id}), "
+    end)
   end
 end

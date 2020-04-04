@@ -6,23 +6,27 @@ defmodule SteamBot.Application do
     use Alchemy.Cogs
 
     Cogs.def steam do
-      Cogs.say "add\ncompare\ndiscord-users\nbot-users"
+      Cogs.say("add\ncompare\ndiscord-users\nbot-users")
     end
 
     Cogs.def steam(command) do
       case command do
         "add" ->
           Func.add()
-          |> Cogs.say
+          |> Cogs.say()
+
         "compare" ->
           Func.compare(Cogs.member(), Cogs.guild_id())
-          |> Cogs.say
+          |> Cogs.say()
+
         "discord-users" ->
           Func.discord_users(Cogs.guild_id())
-          |> Cogs.say
+          |> Cogs.say()
+
         "bot-users" ->
           Func.bot_users()
-          |> Cogs.say
+          |> Cogs.say()
+
         _ ->
           Cogs.say("Command not found")
       end
@@ -32,7 +36,8 @@ defmodule SteamBot.Application do
       case command do
         "add" ->
           Func.add(Cogs.member(), arg1)
-          |> Cogs.say
+          |> Cogs.say()
+
         _ ->
           Cogs.say("Command not found")
       end
@@ -42,7 +47,8 @@ defmodule SteamBot.Application do
       case command do
         "add" ->
           Func.add(Cogs.guild_id(), arg1, arg2)
-          |> Cogs.say
+          |> Cogs.say()
+
         _ ->
           Cogs.say("Command not found")
       end
@@ -57,12 +63,10 @@ defmodule SteamBot.Application do
     import Supervisor.Spec, warn: false
 
     children = [
-      Repo,
+      Repo
     ]
 
     opts = [strategy: :one_for_one, name: SteamBot.Supervisor]
     Supervisor.start_link(children, opts)
-
-
   end
 end

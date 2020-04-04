@@ -19,7 +19,9 @@ defmodule Discord do
 
   def get_members_in_voice_channel(guild_id, channel_id) do
     get_members(guild_id)
-    |> Enum.filter(fn guild_member -> is_user_connected_to_channel?(guild_id, channel_id, guild_member.user.id) end)
+    |> Enum.filter(fn guild_member ->
+      is_user_connected_to_channel?(guild_id, channel_id, guild_member.user.id)
+    end)
   end
 
   defp is_user_connected_to_channel?(guild_id, channel_id, user_id) do

@@ -3,10 +3,10 @@ defmodule Repo.Migrations.CreateUsers do
 
   def change do
     create table(:users) do
-      add :discord_name, :string
-      add :steam_name, :string
-      add :discord_id, :string
-      add :steam_id, :string
+      add(:discord_name, :string)
+      add(:steam_name, :string)
+      add(:discord_id, :string)
+      add(:steam_id, :string)
       timestamps()
     end
   end
