@@ -18,10 +18,10 @@ defmodule SteamBot.Application do
           Func.compare(Cogs.member())
           |> Cogs.say
         "discord-users" ->
-          Func.discordUsers()
+          Func.discord_users(Cogs.member())
           |> Cogs.say
         "bot-users" ->
-          Func.botUsers()
+          Func.bot_users()
           |> Cogs.say
         _ ->
           Cogs.say("Command not found")
