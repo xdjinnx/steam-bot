@@ -32,8 +32,9 @@ defmodule Func do
     'not implemented'
   end
 
-  def discord_users(member) do
-    Client.get_member_list()
+  def discord_users({:ok, guild_id}) do
+    {:ok, members} = Client.get_member_list(guild_id, limit: 100)
+    List.foldl(members, "", fn guild_member, acc -> acc <> "#{guild_member.user.username}:#{guild_member.user.id}, " end)
   end
 
   def bot_users do
