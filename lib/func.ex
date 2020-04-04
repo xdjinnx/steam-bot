@@ -5,20 +5,16 @@ defmodule Func do
     'add <steam-id>'
   end
 
-  def add(member, steam_id) do
-    {:ok, guild_member} = member
-
+  def add({:ok, guild_member}, steam_id) do
     Steam.get_user(steam_id)
     |> insert_user(guild_member.user)
     |> add_response
   end
 
   def add({:ok, guild_id}, steam_id, discord_id) do
-    {:ok, guild_member} = Client.get_member(guild_id, discord_id)
+    guild_member = Discord.get_member(guild_id, discord_id)
 
-    Steam.get_user(steam_id)
-    |> insert_user(guild_member.user)
-    |> add_response
+    add({:ok, guild_member}, steam_id)
   end
 
   defp insert_user(steam_user, discord_user), do: Query.insert_user(%User{
@@ -30,15 +26,26 @@ defmodule Func do
 
   defp add_response({:ok, user}), do: "#{user.discord_name} has been connected to steam user #{user.steam_name}!"
 
-  defp add_response({:error, _}), do: 'Something went wrong'
+  defp add_response({:error, _}), do: 'Something went wrong when writing to database'
 
-  def compare(member) do
-    'not implemented'
+  def compare({:ok, guild_member}, {:ok, guild_id}) do
+    channel_id = Discord.get_current_voice_channel(guild_id, guild_member.user.id)
+    Discord.get_members_in_voice_channel(guild_id, channel_id)
+    |> get_registered_users
+    |> Enum.map(fn user -> {user, Steam.get_owned_games(user.steam_id)} end)
+    #|> List.diff TODO: Make a diff for each user
+    #|> Create response
+  end
+
+  defp get_registered_users(guild_members) do
+    Enum.map(guild_members, fn guild_member -> Query.get_user(guild_member.user.id) end)
+    |> Enum.filter(fn users -> users != [] end)
+    |> Enum.map(fn users -> List.first(users) end)
   end
 
   def discord_users({:ok, guild_id}) do
-    {:ok, members} = Client.get_member_list(guild_id, limit: 100)
-    List.foldl(members, "", fn guild_member, acc -> acc <> "#{guild_member.user.username}:#{guild_member.user.id}, " end)
+    Discord.get_members(guild_id)
+    |> List.foldl("", fn guild_member, acc -> acc <> "#{guild_member.user.username}:#{guild_member.user.id}, " end)
   end
 
   def bot_users do

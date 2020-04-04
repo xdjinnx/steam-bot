@@ -15,7 +15,7 @@ defmodule SteamBot.Application do
           Func.add()
           |> Cogs.say
         "compare" ->
-          Func.compare(Cogs.member())
+          Func.compare(Cogs.member(), Cogs.guild_id())
           |> Cogs.say
         "discord-users" ->
           Func.discord_users(Cogs.guild_id())
