@@ -13,8 +13,12 @@ defmodule Func do
     |> add_response
   end
 
-  def add(member, steam_id, discord_id) do
-    'not implemented'
+  def add({:ok, guild_id}, steam_id, discord_id) do
+    {:ok, guild_member} = Client.get_member(guild_id, discord_id)
+
+    Steam.get_user(steam_id)
+    |> insert_user(guild_member.user)
+    |> add_response
   end
 
   defp insert_user(steam_user, discord_user), do: Query.insert_user(%User{

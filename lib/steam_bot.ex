@@ -41,7 +41,7 @@ defmodule SteamBot.Application do
     Cogs.def steam(command, arg1, arg2) do
       case command do
         "add" ->
-          Func.add(Cogs.member(), arg1, arg2)
+          Func.add(Cogs.guild_id(), arg1, arg2)
           |> Cogs.say
         _ ->
           Cogs.say("Command not found")
