@@ -34,20 +34,18 @@ defmodule Func do
   def compare({:ok, guild_member}, {:ok, guild_id}) do
     channel_id = Discord.get_current_voice_channel(guild_id, guild_member.user.id)
 
-    _ =
-      Discord.get_members_in_voice_channel(guild_id, channel_id)
-      |> filter_registered_users
-      |> Enum.map(fn user -> {user, Steam.get_owned_games(user.steam_id)} end)
-      |> compare_games
-      |> compare_response
+    Discord.get_members_in_voice_channel(guild_id, channel_id)
+    |> filter_registered_users
+    |> Enum.map(fn user -> {user, Steam.get_owned_games(user.steam_id)} end)
+    |> compare_games
+    |> compare_response
   end
 
   defp compare_response({users, games}) do
-    owners = List.foldl(users, "", fn user, acc -> acc <> "<@#{user.discord_name}>, " end)
+    owners = List.foldl(users, "", fn user, acc -> acc <> "<@#{user.discord_id}>, " end)
     in_common = List.foldl(games, "", fn game, acc -> acc <> game["name"] <> ", " end)
     count = Enum.count(games) |> Integer.to_string()
 
-    # Enum.count(games)
     owners <> " have " <> count <> " games in common: " <> in_common
   end
 
