@@ -44,10 +44,11 @@ defmodule Func do
 
   defp compare_response({users, games}) do
     owners = List.foldl(users, "", fn user, acc -> acc <> "<@#{user.discord_name}>, " end)
-    in_common = List.foldl(games, "", fn game, acc -> acc <> "game, " end)
+    in_common = List.foldl(games, "", fn game, acc -> acc <> game["name"] <> ", " end)
+    count = Enum.count(games) |> Integer.to_string()
 
     # Enum.count(games)
-    owners <> " have " <> "1" <> " games in common: " <> in_common
+    owners <> " have " <> count <> " games in common: " <> in_common
   end
 
   defp compare_games(users_games) do
@@ -56,14 +57,13 @@ defmodule Func do
     {
       List.foldl(users_games, [], fn {user, _}, acc -> [user | acc] end),
       List.foldl(users_games, games, fn {_, games}, acc ->
-        Enum.filter(acc, fn {_, game} -> is_game_in_list?(games, game) end)
+        Enum.filter(acc, fn game -> is_game_in_list?(games, game) end)
       end)
     }
   end
 
   defp is_game_in_list?(games, game) do
-    # games_game["appid"] == game["appid"]
-    Enum.any?(games, fn games_game -> true end)
+    Enum.any?(games, fn games_game -> games_game["appid"] == game["appid"] end)
   end
 
   defp filter_registered_users(guild_members) do

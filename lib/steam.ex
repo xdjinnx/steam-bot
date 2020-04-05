@@ -5,7 +5,6 @@ defmodule Steam do
     SteamEx.ISteamUser.get_player_summaries(key, %{
       "steamids" => steam_id
     })
-    |> get_body
     |> decode_body
     |> get_first_user
   end
@@ -23,18 +22,20 @@ defmodule Steam do
       "steamid" => steam_id,
       "include_appinfo" => true
     })
-    |> get_body
     |> decode_body
+    |> get_games
   end
 
-  defp decode_body(body) do
-    Poison.decode!(body)
+  defp get_games({:error, reason}), do: {:error, reason}
+
+  defp get_games(body) do
+    body["response"]["games"]
+  end
+
+  defp decode_body(response) do
+    Poison.decode!(response.body)
   rescue
     Poison.ParseError ->
       {:error, 'could not parse body'}
-  end
-
-  defp get_body(request_response) do
-    request_response.body
   end
 end
