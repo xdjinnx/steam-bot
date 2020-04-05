@@ -2,6 +2,9 @@
 # and its dependencies with the aid of the Mix.Config module.
 use Mix.Config
 
+config :steam_bot, steam_key: "8C1444D72335D5A78A543DBB1CDE6A91"
+config :steam_bot, discord_key: "NjgwODk0NTIzODQwNTI4NDA3.XlHRTg.5vGd1X-3o4-3SHK8bvoIQsnSwwQ"
+
 config :steam_bot,
   ecto_repos: [Repo]
 
@@ -9,24 +12,6 @@ config :steam_bot, Repo,
   adapter: Sqlite.Ecto2,
   database: "bot.sqlite3"
 
-# This configuration is loaded before any dependency and is restricted
-# to this project. If another project depends on this project, this
-# file won't be loaded nor affect the parent project. For this reason,
-# if you want to provide default values for your application for
-# third-party users, it should be done in your "mix.exs" file.
-
-# You can configure your application as:
-#
-#     config :steam_bot, key: :value
-#
-# and access this configuration in your application as:
-#
-#     Application.get_env(:steam_bot, :key)
-#
-# You can also configure a third-party app:
-#
-#     config :logger, level: :info
-#
 
 # It is also possible to import configuration files, relative to this
 # directory. For example, you can emulate configuration per environment

@@ -1,9 +1,14 @@
 defmodule Func do
   alias Alchemy.Client
 
-  def add do
-    'add <steam-id>'
+  def help() do
+    "add <steam_id> [, <discord_id>] - Connect steam and discord user
+compare - Compare steam games with everyone in your voice chat
+discord-users - Display all discord users and their id
+bot-users - Display all connected users"
   end
+
+  def add(), do: help()
 
   def add({:ok, guild_member}, steam_id) do
     Steam.get_user(steam_id)
@@ -35,7 +40,8 @@ defmodule Func do
     channel_id = Discord.get_current_voice_channel(guild_id, guild_member.user.id)
 
     Discord.get_members_in_voice_channel(guild_id, channel_id)
-    |> filter_registered_users
+    |> Enum.map(fn guild_member -> guild_member.user.id end)
+    |> Query.get_users()
     |> Enum.map(fn user -> {user, Steam.get_owned_games(user.steam_id)} end)
     |> compare_games
     |> compare_response
@@ -62,12 +68,6 @@ defmodule Func do
 
   defp is_game_in_list?(games, game) do
     Enum.any?(games, fn games_game -> games_game["appid"] == game["appid"] end)
-  end
-
-  defp filter_registered_users(guild_members) do
-    Enum.map(guild_members, fn guild_member -> Query.get_user(guild_member.user.id) end)
-    |> Enum.filter(fn users -> users != [] end)
-    |> Enum.map(fn users -> List.first(users) end)
   end
 
   def discord_users({:ok, guild_id}) do

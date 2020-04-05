@@ -6,31 +6,22 @@ defmodule SteamBot.Application do
     use Alchemy.Cogs
 
     Cogs.def steam do
-      Cogs.say(
-"add <steam_id> [, <discord_id>] - Connect steam and discord user
-compare - Compare steam games with everyone in your voice chat
-discord-users - Display all discord users and their id
-bot-users - Display all connected users"
-      )
+      Func.help() |> Cogs.say()
     end
 
     Cogs.def steam(command) do
       case command do
         "add" ->
-          Func.add()
-          |> Cogs.say()
+          Func.add() |> Cogs.say()
 
         "compare" ->
-          Func.compare(Cogs.member(), Cogs.guild_id())
-          |> Cogs.say()
+          Func.compare(Cogs.member(), Cogs.guild_id()) |> Cogs.say()
 
         "discord-users" ->
-          Func.discord_users(Cogs.guild_id())
-          |> Cogs.say()
+          Func.discord_users(Cogs.guild_id()) |> Cogs.say()
 
         "bot-users" ->
-          Func.bot_users()
-          |> Cogs.say()
+          Func.bot_users() |> Cogs.say()
 
         _ ->
           Cogs.say("Command not found")
@@ -61,7 +52,7 @@ bot-users - Display all connected users"
   end
 
   def start(_type, _args) do
-    run = Client.start("NjgwODk0NTIzODQwNTI4NDA3.XlHRTg.5vGd1X-3o4-3SHK8bvoIQsnSwwQ")
+    run = Client.start(Application.get_env(:steam_bot, :discord_key))
     use Commands
     run
 

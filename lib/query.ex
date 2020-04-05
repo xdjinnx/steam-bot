@@ -10,10 +10,10 @@ defmodule Query do
     Repo.all(query)
   end
 
-  def get_user(id) do
+  def get_users(ids) do
     query =
       from(u in User,
-        where: u.discord_id == ^id,
+        where: u.discord_id in ^ids,
         select: u
       )
 
