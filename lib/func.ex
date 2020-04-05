@@ -34,27 +34,39 @@ defmodule Func do
   def compare({:ok, guild_member}, {:ok, guild_id}) do
     channel_id = Discord.get_current_voice_channel(guild_id, guild_member.user.id)
 
-    Discord.get_members_in_voice_channel(guild_id, channel_id)
-    |> get_registered_users
-    |> Enum.map(fn user -> {user, Steam.get_owned_games(user.steam_id)} end)
-    |> compare_games
+    _ =
+      Discord.get_members_in_voice_channel(guild_id, channel_id)
+      |> filter_registered_users
+      |> Enum.map(fn user -> {user, Steam.get_owned_games(user.steam_id)} end)
+      |> compare_games
+      |> compare_response
+  end
 
-    # |> Create response
+  defp compare_response({users, games}) do
+    owners = List.foldl(users, "", fn user, acc -> acc <> "<@#{user.discord_name}>, " end)
+    in_common = List.foldl(games, "", fn game, acc -> acc <> "game, " end)
+
+    # Enum.count(games)
+    owners <> " have " <> "1" <> " games in common: " <> in_common
   end
 
   defp compare_games(users_games) do
     {_, games} = List.first(users_games)
 
-    List.foldl(users_games, games, fn {_, games}, acc ->
-      Enum.filter(acc, fn {_, game} -> is_game_in_list?(games, game) end)
-    end)
+    {
+      List.foldl(users_games, [], fn {user, _}, acc -> [user | acc] end),
+      List.foldl(users_games, games, fn {_, games}, acc ->
+        Enum.filter(acc, fn {_, game} -> is_game_in_list?(games, game) end)
+      end)
+    }
   end
 
   defp is_game_in_list?(games, game) do
-    Enum.any?(games, fn games_game -> games_game["appid"] == game["appid"] end)
+    # games_game["appid"] == game["appid"]
+    Enum.any?(games, fn games_game -> true end)
   end
 
-  defp get_registered_users(guild_members) do
+  defp filter_registered_users(guild_members) do
     Enum.map(guild_members, fn guild_member -> Query.get_user(guild_member.user.id) end)
     |> Enum.filter(fn users -> users != [] end)
     |> Enum.map(fn users -> List.first(users) end)
