@@ -6,7 +6,12 @@ defmodule SteamBot.Application do
     use Alchemy.Cogs
 
     Cogs.def steam do
-      Cogs.say("add\ncompare\ndiscord-users\nbot-users")
+      Cogs.say(
+"add <steam_id> [, <discord_id>] - Connect steam and discord user
+compare - Compare steam games with everyone in your voice chat
+discord-users - Display all discord users and their id
+bot-users - Display all connected users"
+      )
     end
 
     Cogs.def steam(command) do
