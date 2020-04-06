@@ -43,7 +43,9 @@ bot-users - Display all connected users"
     |> Enum.map(fn guild_member -> guild_member.user.id end)
     |> Query.get_users()
     |> Enum.map(fn user -> {user, Steam.get_owned_games(user.steam_id)} end)
+    |> Enum.filter(fn {user, games} -> !is_nil(games) end)
     |> compare_games
+    |> filter_multiplayer
     |> compare_response
   end
 
@@ -53,6 +55,10 @@ bot-users - Display all connected users"
     count = Enum.count(games) |> Integer.to_string()
 
     owners <> " have " <> count <> " games in common: " <> in_common
+  end
+
+  defp filter_multiplayer({users, games}) do
+    {users, Enum.filter(games, fn game -> Steam.get_app_info(game["appid"]) |> Steam.is_multiplayer?() end)}
   end
 
   defp compare_games(users_games) do

@@ -5,6 +5,8 @@ use Mix.Config
 config :steam_bot, steam_key: "8C1444D72335D5A78A543DBB1CDE6A91"
 config :steam_bot, discord_key: "NjgwODk0NTIzODQwNTI4NDA3.XlHRTg.5vGd1X-3o4-3SHK8bvoIQsnSwwQ"
 
+config :tesla, adapter: Tesla.Adapter.Hackney
+
 config :steam_bot,
   ecto_repos: [Repo]
 

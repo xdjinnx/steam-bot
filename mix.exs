@@ -23,7 +23,10 @@ defmodule SteamBot.MixProject do
       {:alchemy, "~> 0.6.4", hex: :discord_alchemy},
       {:sqlite_ecto2, "~> 2.2"},
       {:poison, "~> 4.0", override: true},
-      {:steam_ex, "~> 0.2.0-alpha"}
+      {:steam_ex, "~> 0.2.0-alpha"},
+      {:jason, "~> 1.2"},
+      {:tesla, "~> 1.3.0"},
+      {:hackney, "~> 1.15.2"}
     ]
   end
 end
