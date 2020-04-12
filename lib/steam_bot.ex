@@ -23,6 +23,9 @@ defmodule SteamBot.Application do
         "bot-users" ->
           Func.bot_users() |> Cogs.say()
 
+        "index" ->
+          Func.index(Cogs.member()) |> Cogs.say()
+
         _ ->
           Cogs.say("Command not found")
       end

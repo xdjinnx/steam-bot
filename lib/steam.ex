@@ -37,14 +37,26 @@ defmodule Steam do
 
   def get_app_info(appid) do
     get("https://store.steampowered.com/api/appdetails?appids=" <> Integer.to_string(appid))
-    |> get_app_info
+    |> get_app_info(appid)
   end
 
-  defp get_app_info({:ok, response}, appid), do: response.body[appid]["data"]
+  #defp get_app_info({:ok, response}, appid), do: response.body[Integer.to_string(appid)]["data"]
+  defp get_app_info({:ok, response}, appid) do
+    cond do
+      response.body[Integer.to_string(appid)]["success"] ->
+        response.body[Integer.to_string(appid)]["data"]
+      true ->
+        %{
+          "categories" => [
+            %{"description" => "Multi-player", "id" => 1},
+          ]
+        }
+    end
+  end
 
   def is_multiplayer?(app_info) do
-    # id number 2 is multiplayer
-    Enum.any?(app_info["categories"], fn category -> category["id"] == 2 end)
+    # id number 1 is multiplayer
+    Enum.any?(app_info["categories"], fn category -> category["id"] == 1 end)
   end
 
   defp decode_body(response) do

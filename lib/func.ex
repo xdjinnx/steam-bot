@@ -45,7 +45,8 @@ bot-users - Display all connected users"
     |> Enum.map(fn user -> {user, Steam.get_owned_games(user.steam_id)} end)
     |> Enum.filter(fn {user, games} -> !is_nil(games) end)
     |> compare_games
-    |> filter_multiplayer
+    # TODO: Improve this by indexing games separably. To many calls to Steam
+    #|> filter_multiplayer
     |> compare_response
   end
 
@@ -58,7 +59,10 @@ bot-users - Display all connected users"
   end
 
   defp filter_multiplayer({users, games}) do
-    {users, Enum.filter(games, fn game -> Steam.get_app_info(game["appid"]) |> Steam.is_multiplayer?() end)}
+    {users, Enum.filter(games, fn game ->
+      Steam.get_app_info(game["appid"])
+      |> Steam.is_multiplayer?()
+    end)}
   end
 
   defp compare_games(users_games) do
@@ -88,5 +92,50 @@ bot-users - Display all connected users"
     |> List.foldl("", fn user, acc ->
       acc <> "#{user.discord_name}: #{user.steam_name}(#{user.steam_id}), "
     end)
+  end
+
+  def index({:ok, guild_member}) do
+    user = Query.get_user(guild_member.user.id)
+
+    app_ids = Steam.get_owned_games(user.steam_id)
+    |> Enum.map(fn game -> game["appid"] end)
+
+    indexed_games = Query.get_games(app_ids)
+
+    games_to_index = Enum.filter(app_ids, fn game ->
+      !Enum.any?(indexed_games, fn indexed_game -> app_ids == indexed_game.app_id end)
+    end)
+    #|> List.foldl([], fn app_id, acc ->
+    #  Process.sleep(1000)
+    #  [Steam.get_app_info(app_id) | acc]
+    #end)
+    |> (fn app_ids -> [Steam.get_app_info(List.first(app_ids))] end).()
+    |> insert_games
+  end
+
+  defp insert_games(games) do
+    Enum.map(games, fn game ->
+      {
+        %Game{
+          app_id: game["steam_appid"],
+          name: game["name"],
+        },
+        Enum.map(game["categories"], fn category ->
+          %Category{
+            # TODO: game_id needs to be set somehow
+            description: category["description"],
+            category_id: category["id"],
+          }
+        end),
+        Enum.map(game["genres"], fn genre ->
+          %Genre{
+            # TODO: game_id needs to be set somehow
+            description: genre["description"],
+            genre_id: genre["id"],
+          }
+        end)
+      }
+    end)
+    |> Query.insert_games_with_tags
   end
 end
