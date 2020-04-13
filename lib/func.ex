@@ -111,6 +111,8 @@ bot-users - Display all connected users"
     #end)
     |> (fn app_ids -> [Steam.get_app_info(List.first(app_ids))] end).()
     |> insert_games
+
+    "I'm done indexing"
   end
 
   defp insert_games(games) do
@@ -122,14 +124,12 @@ bot-users - Display all connected users"
         },
         Enum.map(game["categories"], fn category ->
           %Category{
-            # TODO: game_id needs to be set somehow
             description: category["description"],
             category_id: category["id"],
           }
         end),
         Enum.map(game["genres"], fn genre ->
           %Genre{
-            # TODO: game_id needs to be set somehow
             description: genre["description"],
             genre_id: genre["id"],
           }

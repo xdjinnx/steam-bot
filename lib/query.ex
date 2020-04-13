@@ -47,18 +47,22 @@ defmodule Query do
   end
 
   def insert_games_with_tags(games_with_tags) do
-    games = List.foldl(games_with_tags, [], fn {game, _, _}, acc -> [game | acc] end)
-    categories = List.foldl(games_with_tags, [], fn {_, categories, _}, acc -> categories ++ acc end)
-    genres = List.foldl(games_with_tags, [], fn {_, _, genres}, acc -> genres ++ acc end)
+    Enum.map(games_with_tags, fn game_with_tags -> insert_game_with_tags(game_with_tags) end)
+  end
 
-    IO.inspect(games)
-    IO.inspect(categories)
-    IO.inspect(genres)
-
+  def insert_game_with_tags({game, categories, genres}) do
     Multi.new()
-    |> Multi.insert_all(:insert_all, Game, games)
-    |> Multi.insert_all(:insert_all, Category, categories)
-    |> Multi.insert_all(:insert_all, Genre, genres)
+    |> Multi.insert(:insert_game, game)
+    |> Multi.insert_all(:insert_all_categories, Category, fn %{insert_game: %Game{id: game_id}} ->
+      Enum.map(categories, fn category ->
+        Category.changeset(category, %{game_id => game_id})
+      end)
+    end)
+    |> Multi.insert_all(:insert_all_genres, Genre, fn %{insert_game: %Game{id: game_id}} ->
+      Enum.map(genres, fn genre ->
+        Genre.changeset(genre, %{game_id => game_id})
+      end)
+    end)
     |> Repo.transaction()
   end
 end
