@@ -51,18 +51,20 @@ defmodule Query do
   end
 
   def insert_game_with_tags({game, categories, genres}) do
-    Multi.new()
+    multi = Multi.new()
     |> Multi.insert(:insert_game, game)
-    |> Multi.insert_all(:insert_all_categories, Category, fn %{insert_game: %Game{id: game_id}} ->
-      Enum.map(categories, fn category ->
-        Category.changeset(category, %{game_id => game_id})
-      end)
+    |> IO.inspect
+
+    categories_with_game_id = Enum.map(categories, fn category ->
+      Category.changeset(category, %{:game_id => multi.insert_game.id})
     end)
-    |> Multi.insert_all(:insert_all_genres, Genre, fn %{insert_game: %Game{id: game_id}} ->
-      Enum.map(genres, fn genre ->
-        Genre.changeset(genre, %{game_id => game_id})
-      end)
+
+    genres_with_game_id = Enum.map(genres, fn genre ->
+      Genre.changeset(genre, %{:game_id => multi.insert_game.id})
     end)
+
+    Multi.insert_all(multi, :insert_all_categories, Category, categories_with_game_id)
+    |> Multi.insert_all(:insert_all_genres, Genre, genres_with_game_id)
     |> Repo.transaction()
   end
 end
