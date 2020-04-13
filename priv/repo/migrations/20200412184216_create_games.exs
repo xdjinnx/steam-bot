@@ -3,7 +3,7 @@ defmodule Repo.Migrations.CreateGames do
 
   def change do
     create table(:games) do
-      add(:app_id, :string)
+      add(:app_id, :integer)
       add(:name, :string)
       add(:categories, :string)
       add(:genres, :string)

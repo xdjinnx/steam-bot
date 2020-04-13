@@ -3,7 +3,6 @@ defmodule Repo.Migrations.AlterGames do
 
   def change do
     alter table("games") do
-      modify(:app_id, :integer)
       remove(:categories)
       remove(:genres)
     end

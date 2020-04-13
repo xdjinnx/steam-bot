@@ -7,12 +7,13 @@ config :steam_bot, discord_key: "NjgwODk0NTIzODQwNTI4NDA3.XlHRTg.5vGd1X-3o4-3SHK
 
 config :tesla, adapter: Tesla.Adapter.Hackney
 
-config :steam_bot,
-  ecto_repos: [Repo]
+config :steam_bot, ecto_repos: [Repo]
 
 config :steam_bot, Repo,
-  adapter: Sqlite.Ecto2,
-  database: "bot.sqlite3"
+       database: "steam_bot_repo",
+       username: "postgres",
+       password: "docker",
+       hostname: "localhost"
 
 
 # It is also possible to import configuration files, relative to this
