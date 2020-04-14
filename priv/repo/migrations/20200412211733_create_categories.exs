@@ -3,9 +3,9 @@ defmodule Repo.Migrations.CreateCategories do
 
   def change do
     create table(:categories) do
-      add(:game_id, :integer)
+      add(:game_id, references(:games))
       add(:description, :string)
-      add(:categories_id, :integer)
+      add(:category_id, :integer)
       timestamps()
     end
   end

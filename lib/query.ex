@@ -1,5 +1,6 @@
 defmodule Query do
   import Ecto.Query
+  import Ecto.Changeset
   alias Ecto.Multi
 
   def get_all_users do
@@ -53,18 +54,23 @@ defmodule Query do
   def insert_game_with_tags({game, categories, genres}) do
     multi = Multi.new()
     |> Multi.insert(:insert_game, game)
-    |> IO.inspect
 
-    categories_with_game_id = Enum.map(categories, fn category ->
-      Category.changeset(category, %{:game_id => multi.insert_game.id})
+    categories_multi = Enum.reduce(categories, multi, fn category, acc_multi ->
+      Multi.insert(acc_multi, {:category, category.category_id}, fn %{insert_game: game} ->
+        category
+        |> Ecto.Changeset.cast(%{:game_id => game.id}, [:game_id])
+        |> Ecto.Changeset.assoc_constraint(:game)
+      end)
     end)
 
-    genres_with_game_id = Enum.map(genres, fn genre ->
-      Genre.changeset(genre, %{:game_id => multi.insert_game.id})
+    genres_multi = Enum.reduce(genres, categories_multi, fn genre, acc_multi ->
+      Multi.insert(acc_multi, {:genre, genre.genre_id}, fn %{insert_game: game} ->
+        genre
+        |> Ecto.Changeset.cast(%{:game_id => game.id}, [:game_id])
+        |> Ecto.Changeset.assoc_constraint(:game)
+      end)
     end)
 
-    Multi.insert_all(multi, :insert_all_categories, Category, categories_with_game_id)
-    |> Multi.insert_all(:insert_all_genres, Genre, genres_with_game_id)
-    |> Repo.transaction()
+    Repo.transaction(genres_multi)
   end
 end

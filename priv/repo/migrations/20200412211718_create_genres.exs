@@ -3,7 +3,7 @@ defmodule Repo.Migrations.CreateGenres do
 
   def change do
     create table(:genres) do
-      add(:game_id, :integer)
+      add(:game_id, references(:games))
       add(:description, :string)
       add(:genre_id, :string)
       timestamps()
