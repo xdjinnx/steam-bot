@@ -6,25 +6,25 @@ defmodule SteamBot.Application do
     use Alchemy.Cogs
 
     Cogs.def steam do
-      Func.help() |> Cogs.say()
+      SteamBot.Func.help() |> Cogs.say()
     end
 
     Cogs.def steam(command) do
       case command do
         "add" ->
-          Func.add() |> Cogs.say()
+          SteamBot.Func.add() |> Cogs.say()
 
         "compare" ->
-          Func.compare(Cogs.member(), Cogs.guild_id()) |> Cogs.say()
+          SteamBot.Func.compare(Cogs.member(), Cogs.guild_id()) |> Cogs.say()
 
         "discord-users" ->
-          Func.discord_users(Cogs.guild_id()) |> Cogs.say()
+          SteamBot.Func.discord_users(Cogs.guild_id()) |> Cogs.say()
 
         "bot-users" ->
-          Func.bot_users() |> Cogs.say()
+          SteamBot.Func.bot_users() |> Cogs.say()
 
         "index" ->
-          Func.index(Cogs.member()) |> Cogs.say()
+          SteamBot.Func.index(Cogs.member()) |> Cogs.say()
 
         _ ->
           Cogs.say("Command not found")
@@ -34,7 +34,7 @@ defmodule SteamBot.Application do
     Cogs.def steam(command, arg1) do
       case command do
         "add" ->
-          Func.add(Cogs.member(), arg1)
+          SteamBot.Func.add(Cogs.member(), arg1)
           |> Cogs.say()
 
         _ ->
@@ -45,7 +45,7 @@ defmodule SteamBot.Application do
     Cogs.def steam(command, arg1, arg2) do
       case command do
         "add" ->
-          Func.add(Cogs.guild_id(), arg1, arg2)
+          SteamBot.Func.add(Cogs.guild_id(), arg1, arg2)
           |> Cogs.say()
 
         _ ->
@@ -62,7 +62,7 @@ defmodule SteamBot.Application do
     import Supervisor.Spec, warn: false
 
     children = [
-      Repo
+      SteamBot.Repo
     ]
 
     opts = [strategy: :one_for_one, name: SteamBot.Supervisor]

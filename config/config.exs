@@ -7,9 +7,9 @@ config :steam_bot, discord_key: "NjgwODk0NTIzODQwNTI4NDA3.XlHRTg.5vGd1X-3o4-3SHK
 
 config :tesla, adapter: Tesla.Adapter.Hackney
 
-config :steam_bot, ecto_repos: [Repo]
+config :steam_bot, ecto_repos: [SteamBot.Repo]
 
-config :steam_bot, Repo,
+config :steam_bot, SteamBot.Repo,
        database: "steam_bot_repo",
        username: "postgres",
        password: "docker",

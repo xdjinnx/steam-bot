@@ -1,6 +1,4 @@
-defmodule Func do
-  alias Alchemy.Client
-
+defmodule SteamBot.Func do
   def help() do
     "add <steam_id> [, <discord_id>] - Connect steam and discord user
 compare - Compare steam games with everyone in your voice chat
@@ -11,20 +9,20 @@ bot-users - Display all connected users"
   def add(), do: help()
 
   def add({:ok, guild_member}, steam_id) do
-    Steam.get_user(steam_id)
+    SteamBot.Steam.get_user(steam_id)
     |> insert_user(guild_member.user)
     |> add_response
   end
 
   def add({:ok, guild_id}, steam_id, discord_id) do
-    guild_member = Discord.get_member(guild_id, discord_id)
+    guild_member = SteamBot.Discord.get_member(guild_id, discord_id)
 
     add({:ok, guild_member}, steam_id)
   end
 
   defp insert_user(steam_user, discord_user),
     do:
-      Query.insert_user(%User{
+      SteamBot.Query.insert_user(%SteamBot.Schema.User{
         discord_id: discord_user.id,
         discord_name: discord_user.username,
         steam_name: steam_user["personaname"],
@@ -37,12 +35,12 @@ bot-users - Display all connected users"
   defp add_response({:error, _}), do: 'Something went wrong when writing to database'
 
   def compare({:ok, guild_member}, {:ok, guild_id}) do
-    channel_id = Discord.get_current_voice_channel(guild_id, guild_member.user.id)
+    channel_id = SteamBot.Discord.get_current_voice_channel(guild_id, guild_member.user.id)
 
-    Discord.get_members_in_voice_channel(guild_id, channel_id)
+    SteamBot.Discord.get_members_in_voice_channel(guild_id, channel_id)
     |> Enum.map(fn guild_member -> guild_member.user.id end)
-    |> Query.get_users()
-    |> Enum.map(fn user -> {user, Steam.get_owned_games(user.steam_id)} end)
+    |> SteamBot.Query.get_users()
+    |> Enum.map(fn user -> {user, SteamBot.Steam.get_owned_games(user.steam_id)} end)
     |> Enum.filter(fn {user, games} -> !is_nil(games) end)
     |> compare_games
     # TODO: Improve this by indexing games separably. To many calls to Steam
@@ -60,8 +58,8 @@ bot-users - Display all connected users"
 
   defp filter_multiplayer({users, games}) do
     {users, Enum.filter(games, fn game ->
-      Steam.get_app_info(game["appid"])
-      |> Steam.is_multiplayer?()
+      SteamBot.Steam.get_app_info(game["appid"])
+      |> SteamBot.Steam.is_multiplayer?()
     end)}
   end
 
@@ -81,26 +79,26 @@ bot-users - Display all connected users"
   end
 
   def discord_users({:ok, guild_id}) do
-    Discord.get_members(guild_id)
+    SteamBot.Discord.get_members(guild_id)
     |> List.foldl("", fn guild_member, acc ->
       acc <> "#{guild_member.user.username}:#{guild_member.user.id}, "
     end)
   end
 
   def bot_users do
-    Query.get_all_users()
+    SteamBot.Query.get_all_users()
     |> List.foldl("", fn user, acc ->
       acc <> "#{user.discord_name}: #{user.steam_name}(#{user.steam_id}), "
     end)
   end
 
   def index({:ok, guild_member}) do
-    user = Query.get_user(guild_member.user.id)
+    user = SteamBot.Query.get_user(guild_member.user.id)
 
-    app_ids = Steam.get_owned_games(user.steam_id)
+    app_ids = SteamBot.Steam.get_owned_games(user.steam_id)
     |> Enum.map(fn game -> game["appid"] end)
 
-    indexed_games = Query.get_games(app_ids)
+    indexed_games = SteamBot.Query.get_games(app_ids)
 
     games_to_index = Enum.filter(app_ids, fn game ->
       !Enum.any?(indexed_games, fn indexed_game -> app_ids == indexed_game.app_id end)
@@ -109,7 +107,7 @@ bot-users - Display all connected users"
     #  Process.sleep(1000)
     #  [Steam.get_app_info(app_id) | acc]
     #end)
-    |> (fn app_ids -> [Steam.get_app_info(List.first(app_ids))] end).()
+    |> (fn app_ids -> [SteamBot.Steam.get_app_info(List.first(app_ids))] end).()
     |> insert_games
 
     "I'm done indexing"
@@ -118,24 +116,24 @@ bot-users - Display all connected users"
   defp insert_games(games) do
     Enum.map(games, fn game ->
       {
-        %Game{
+        %SteamBot.Schema.Game{
           app_id: game["steam_appid"],
           name: game["name"],
         },
         Enum.map(game["categories"], fn category ->
-          %Category{
+          %SteamBot.Schema.Category{
             description: category["description"],
             category_id: category["id"],
           }
         end),
         Enum.map(game["genres"], fn genre ->
-          %Genre{
+          %SteamBot.Schema.Genre{
             description: genre["description"],
             genre_id: genre["id"],
           }
         end)
       }
     end)
-    |> Query.insert_games_with_tags
+    |> SteamBot.Query.insert_games_with_tags
   end
 end

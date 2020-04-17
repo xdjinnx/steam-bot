@@ -1,4 +1,4 @@
-defmodule Steam do
+defmodule SteamBot.Steam do
   use Tesla
 
   plug Tesla.Middleware.BaseUrl, "https://api.github.com"

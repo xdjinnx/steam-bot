@@ -1,50 +1,49 @@
-defmodule Query do
+defmodule SteamBot.Query do
   import Ecto.Query
-  import Ecto.Changeset
   alias Ecto.Multi
 
   def get_all_users do
     query =
-      from(u in User,
+      from(u in SteamBot.Schema.User,
         select: u
       )
 
-    Repo.all(query)
+    SteamBot.Repo.all(query)
   end
 
   def get_users(ids) do
     query =
-      from(u in User,
+      from(u in SteamBot.Schema.User,
         where: u.discord_id in ^ids,
         select: u
       )
 
-    Repo.all(query)
+    SteamBot.Repo.all(query)
   end
 
   def get_user(id) do
     query =
-      from(u in User,
+      from(u in SteamBot.Schema.User,
         where: u.discord_id == ^id,
         select: u
       )
 
-    Repo.all(query)
+    SteamBot.Repo.all(query)
     |> List.first()
   end
 
   def insert_user(user) do
-    Repo.insert(user)
+    SteamBot.Repo.insert(user)
   end
 
   def get_games(ids) do
     query =
-      from(g in Game,
+      from(g in SteamBot.Schema.Game,
         where: g.app_id in ^ids,
         select: g
       )
 
-    Repo.all(query)
+    SteamBot.Repo.all(query)
   end
 
   def insert_games_with_tags(games_with_tags) do
@@ -71,6 +70,6 @@ defmodule Query do
       end)
     end)
 
-    Repo.transaction(genres_multi)
+    SteamBot.Repo.transaction(genres_multi)
   end
 end
