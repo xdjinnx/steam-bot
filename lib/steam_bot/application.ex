@@ -62,7 +62,9 @@ defmodule SteamBot.Application do
     import Supervisor.Spec, warn: false
 
     children = [
-      SteamBot.Repo
+      SteamBot.Repo,
+      {BlockingQueue, :infinity},
+      SteamBot.Indexer
     ]
 
     opts = [strategy: :one_for_one, name: SteamBot.Supervisor]

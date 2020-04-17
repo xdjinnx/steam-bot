@@ -51,24 +51,27 @@ defmodule SteamBot.Query do
   end
 
   def insert_game_with_tags({game, categories, genres}) do
-    multi = Multi.new()
-    |> Multi.insert(:insert_game, game)
+    multi =
+      Multi.new()
+      |> Multi.insert(:insert_game, game)
 
-    categories_multi = Enum.reduce(categories, multi, fn category, acc_multi ->
-      Multi.insert(acc_multi, {:category, category.category_id}, fn %{insert_game: game} ->
-        category
-        |> Ecto.Changeset.cast(%{:game_id => game.id}, [:game_id])
-        |> Ecto.Changeset.assoc_constraint(:game)
+    categories_multi =
+      Enum.reduce(categories, multi, fn category, acc_multi ->
+        Multi.insert(acc_multi, {:category, category.category_id}, fn %{insert_game: game} ->
+          category
+          |> Ecto.Changeset.cast(%{:game_id => game.id}, [:game_id])
+          |> Ecto.Changeset.assoc_constraint(:game)
+        end)
       end)
-    end)
 
-    genres_multi = Enum.reduce(genres, categories_multi, fn genre, acc_multi ->
-      Multi.insert(acc_multi, {:genre, genre.genre_id}, fn %{insert_game: game} ->
-        genre
-        |> Ecto.Changeset.cast(%{:game_id => game.id}, [:game_id])
-        |> Ecto.Changeset.assoc_constraint(:game)
+    genres_multi =
+      Enum.reduce(genres, categories_multi, fn genre, acc_multi ->
+        Multi.insert(acc_multi, {:genre, genre.genre_id}, fn %{insert_game: game} ->
+          genre
+          |> Ecto.Changeset.cast(%{:game_id => game.id}, [:game_id])
+          |> Ecto.Changeset.assoc_constraint(:game)
+        end)
       end)
-    end)
 
     SteamBot.Repo.transaction(genres_multi)
   end

@@ -1,8 +1,8 @@
 defmodule SteamBot.Steam do
   use Tesla
 
-  plug Tesla.Middleware.BaseUrl, "https://api.github.com"
-  plug Tesla.Middleware.JSON
+  plug(Tesla.Middleware.BaseUrl, "https://api.github.com")
+  plug(Tesla.Middleware.JSON)
 
   def steam_key(), do: Application.get_env(:steam_bot, :steam_key)
 
@@ -40,15 +40,16 @@ defmodule SteamBot.Steam do
     |> get_app_info(appid)
   end
 
-  #defp get_app_info({:ok, response}, appid), do: response.body[Integer.to_string(appid)]["data"]
+  # defp get_app_info({:ok, response}, appid), do: response.body[Integer.to_string(appid)]["data"]
   defp get_app_info({:ok, response}, appid) do
     cond do
       response.body[Integer.to_string(appid)]["success"] ->
         response.body[Integer.to_string(appid)]["data"]
+
       true ->
         %{
           "categories" => [
-            %{"description" => "Multi-player", "id" => 1},
+            %{"description" => "Multi-player", "id" => 1}
           ]
         }
     end
