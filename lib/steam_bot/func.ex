@@ -9,9 +9,12 @@ bot-users - Display all connected users"
   def add(), do: help()
 
   def add({:ok, guild_member}, steam_id) do
-    SteamBot.Steam.get_user(steam_id)
+    add_user = SteamBot.Steam.get_user(steam_id)
     |> insert_user(guild_member.user)
-    |> add_response
+
+    index({:ok, guild_member})
+
+    add_response(add_user)
   end
 
   def add({:ok, guild_id}, steam_id, discord_id) do
