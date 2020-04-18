@@ -21,9 +21,11 @@ defmodule SteamBot.Indexer do
     |> validate_game_data()
     |> insert_game(app_id)
   end
+
   defp index_game(_, _), do: :ok
 
   defp validate_game_data({:error, r}), do: {:error, r}
+
   defp validate_game_data({:ok, game}) do
     if game["name"] != "" && game["categories"] != nil && game["genres"] != nil do
       game

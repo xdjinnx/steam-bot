@@ -46,6 +46,17 @@ defmodule SteamBot.Query do
     SteamBot.Repo.all(query)
   end
 
+  def get_games_with_tags(ids) do
+    query =
+      from(g in SteamBot.Schema.Game,
+        where: g.app_id in ^ids,
+        select: g,
+        preload: [:genres, :categories]
+      )
+
+    SteamBot.Repo.all(query)
+  end
+
   def get_game(id) do
     query =
       from(g in SteamBot.Schema.Game,

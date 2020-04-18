@@ -44,6 +44,7 @@ defmodule SteamBot.Steam do
     cond do
       response.body[Integer.to_string(appid)]["success"] ->
         {:ok, response.body[Integer.to_string(appid)]["data"]}
+
       true ->
         {:error, :not_found}
     end

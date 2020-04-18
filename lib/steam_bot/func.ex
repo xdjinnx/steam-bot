@@ -43,8 +43,7 @@ bot-users - Display all connected users"
     |> Enum.map(fn user -> {user, SteamBot.Steam.get_owned_games(user.steam_id)} end)
     |> Enum.filter(fn {user, games} -> !is_nil(games) end)
     |> compare_games
-    # TODO: Improve this by indexing games separably. To many calls to Steam
-    # |> filter_multiplayer
+    |> filter_multiplayer
     |> compare_response
   end
 
@@ -57,12 +56,17 @@ bot-users - Display all connected users"
   end
 
   defp filter_multiplayer({users, games}) do
-    {users,
-     Enum.filter(games, fn game ->
-       SteamBot.Steam.get_app_info(game["appid"])
-       |> SteamBot.Steam.is_multiplayer?()
-     end)}
+    games_with_tags = Enum.map(games, fn game -> game["appid"] end)
+    |> SteamBot.Query.get_games_with_tags()
+
+    {users, Enum.filter(games, fn game ->
+      Enum.find(games_with_tags, fn game_with_tags -> game_with_tags.app_id == game["appid"] end)
+      |> is_multiplayer
+    end)}
   end
+
+  defp is_multiplayer(nil), do: false
+  defp is_multiplayer(game), do: Enum.any?(game.categories, fn category -> category.category_id == 1 end)
 
   defp compare_games(users_games) do
     {_, games} = List.first(users_games)

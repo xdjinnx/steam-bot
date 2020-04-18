@@ -15,7 +15,9 @@ defmodule SteamBot.IndexQueue do
         receive do
           {:awaken, data} -> data
         end
-      data -> data
+
+      data ->
+        data
     end
   end
 
@@ -25,8 +27,8 @@ defmodule SteamBot.IndexQueue do
   end
 
   @impl true
-  def handle_call(:pop, from, {{[],[]}, waiting}) do
-    {:reply, :block, {{[],[]}, [from|waiting]}}
+  def handle_call(:pop, from, {{[], []}, waiting}) do
+    {:reply, :block, {{[], []}, [from | waiting]}}
   end
 
   @impl true
@@ -42,8 +44,8 @@ defmodule SteamBot.IndexQueue do
   end
 
   @impl true
-  def handle_cast({:push, element}, {_, [next|rest]}) do
+  def handle_cast({:push, element}, {_, [next | rest]}) do
     send(elem(next, 0), {:awaken, element})
-    {:noreply, {{[],[]}, rest}}
+    {:noreply, {{[], []}, rest}}
   end
 end
