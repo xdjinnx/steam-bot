@@ -8,18 +8,19 @@ defmodule SteamBot.Indexer do
   def run(no_arg) do
     app_id = SteamBot.IndexQueue.pop()
 
-    case SteamBot.Query.get_game(app_id) do
-      [] -> index_game(app_id)
-      _ -> run(no_arg)
-    end
+    SteamBot.Query.get_game(app_id)
+    |> index_game(app_id)
+
+    run(no_arg)
   end
 
-  defp index_game(app_id) do
+  defp index_game([], app_id) do
     Process.sleep(1000)
 
     SteamBot.Steam.get_app_info(app_id)
     |> insert_game
   end
+  defp index_game(_, _), do: :ok
 
   defp insert_game(game) do
     SteamBot.Query.insert_game_with_tags({

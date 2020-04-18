@@ -96,10 +96,9 @@ bot-users - Display all connected users"
   def index({:ok, guild_member}) do
     user = SteamBot.Query.get_user(guild_member.user.id)
 
-    app_ids =
-      SteamBot.Steam.get_owned_games(user.steam_id)
-      |> Enum.map(fn game -> game["appid"] end)
-      |> Enum.reduce([], fn app_id, acc -> SteamBot.IndexQueue.push(app_id) end)
+    SteamBot.Steam.get_owned_games(user.steam_id)
+    |> Enum.map(fn game -> game["appid"] end)
+    |> Enum.reduce([], fn app_id, acc -> SteamBot.IndexQueue.push(app_id) end)
 
     "I have started indexing"
   end

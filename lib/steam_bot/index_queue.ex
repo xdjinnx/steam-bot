@@ -43,7 +43,7 @@ defmodule SteamBot.IndexQueue do
 
   @impl true
   def handle_cast({:push, element}, {_, [next|rest]}) do
-    send(next, {:awaken, element})
+    send(elem(next, 0), {:awaken, element})
     {:noreply, {{[],[]}, rest}}
   end
 end
