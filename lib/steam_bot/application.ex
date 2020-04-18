@@ -37,6 +37,10 @@ defmodule SteamBot.Application do
           SteamBot.Func.add(Cogs.member(), arg1)
           |> Cogs.say()
 
+        "index" ->
+          SteamBot.Func.index(arg1)
+          |> Cogs.say()
+
         _ ->
           Cogs.say("Command not found")
       end

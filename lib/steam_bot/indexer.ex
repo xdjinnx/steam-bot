@@ -27,11 +27,14 @@ defmodule SteamBot.Indexer do
   defp validate_game_data({:error, r}), do: {:error, r}
 
   defp validate_game_data({:ok, game}) do
-    if game["name"] != "" && game["categories"] != nil && game["genres"] != nil do
-      game
+    cond do
+      game["name"] != "" && !is_nil(game["categories"]) && !is_nil(game["genres"]) -> game
+      true -> {:error, :invalid}
     end
+  end
 
-    {:error, :invalid}
+  defp insert_game({:error, :invalid}, app_id) do
+    IO.puts("Data is broken")
   end
 
   defp insert_game({:error, _}, app_id) do
