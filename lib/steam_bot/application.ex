@@ -63,7 +63,7 @@ defmodule SteamBot.Application do
 
     children = [
       SteamBot.Repo,
-      {BlockingQueue, :infinity},
+      SteamBot.IndexQueue,
       SteamBot.Indexer
     ]
 

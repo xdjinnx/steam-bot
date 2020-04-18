@@ -46,8 +46,14 @@ defmodule SteamBot.Query do
     SteamBot.Repo.all(query)
   end
 
-  def insert_games_with_tags(games_with_tags) do
-    Enum.map(games_with_tags, fn game_with_tags -> insert_game_with_tags(game_with_tags) end)
+  def get_game(id) do
+    query =
+      from(g in SteamBot.Schema.Game,
+        where: g.app_id == ^id,
+        select: g
+      )
+
+    SteamBot.Repo.all(query)
   end
 
   def insert_game_with_tags({game, categories, genres}) do

@@ -99,7 +99,7 @@ bot-users - Display all connected users"
     app_ids =
       SteamBot.Steam.get_owned_games(user.steam_id)
       |> Enum.map(fn game -> game["appid"] end)
-      |> BlockingQueue.push_steam(BlockingQueue)
+      |> Enum.reduce([], fn app_id, acc -> SteamBot.IndexQueue.push(app_id) end)
 
     "I have started indexing"
   end
