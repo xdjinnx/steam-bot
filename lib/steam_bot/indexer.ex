@@ -18,14 +18,28 @@ defmodule SteamBot.Indexer do
     Process.sleep(1000)
 
     SteamBot.Steam.get_app_info(app_id)
-    |> insert_game
+    |> validate_game_data()
+    |> insert_game(app_id)
   end
   defp index_game(_, _), do: :ok
 
-  defp insert_game(game) do
+  defp validate_game_data({:error, r}), do: {:error, r}
+  defp validate_game_data({:ok, game}) do
+    if game["name"] != "" && game["categories"] != nil && game["genres"] != nil do
+      game
+    end
+
+    {:error, :invalid}
+  end
+
+  defp insert_game({:error, _}, app_id) do
+    "We need to handle error somehow"
+  end
+
+  defp insert_game(game, app_id) do
     SteamBot.Query.insert_game_with_tags({
       %SteamBot.Schema.Game{
-        app_id: game["steam_appid"],
+        app_id: app_id,
         name: game["name"]
       },
       Enum.map(game["categories"], fn category ->

@@ -40,18 +40,12 @@ defmodule SteamBot.Steam do
     |> get_app_info(appid)
   end
 
-  # defp get_app_info({:ok, response}, appid), do: response.body[Integer.to_string(appid)]["data"]
   defp get_app_info({:ok, response}, appid) do
     cond do
       response.body[Integer.to_string(appid)]["success"] ->
-        response.body[Integer.to_string(appid)]["data"]
-
+        {:ok, response.body[Integer.to_string(appid)]["data"]}
       true ->
-        %{
-          "categories" => [
-            %{"description" => "Multi-player", "id" => 1}
-          ]
-        }
+        {:error, :not_found}
     end
   end
 
