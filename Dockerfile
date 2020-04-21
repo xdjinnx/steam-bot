@@ -5,19 +5,10 @@ WORKDIR /app
 
 COPY . .
 
-RUN export MIX_ENV=prod && \
-    rm -Rf _build && \
-    mix deps.get && \
-    mix release
+ENV MIX_ENV=prod
 
-FROM bitwalker/alpine-erlang:latest
+RUN rm -Rf _build
+RUN mix deps.get
+RUN mix compile
 
-RUN mkdir /app
-WORKDIR /app
-ENV HOME=/app
-
-COPY --from=build /app/_build/prod/rel/steam_bot ./
-RUN chown -R nobody: /app
-USER nobody
-
-CMD ["bin/steam_bot", "start"]
+CMD mix run --no-halt
