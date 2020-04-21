@@ -61,9 +61,6 @@ defmodule SteamBot.Application do
   def start(_type, _args) do
     run = Client.start(Application.get_env(:steam_bot, :discord_key))
     use Commands
-    run
-
-    import Supervisor.Spec, warn: false
 
     children = [
       SteamBot.Repo,
