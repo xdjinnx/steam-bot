@@ -1,5 +1,7 @@
 version: '3.3'
 services:
+  steam_bot:
+    build: .
   postgres:
     image: postgres
     ports:

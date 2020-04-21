@@ -13,7 +13,7 @@ config :steam_bot, SteamBot.Repo,
        database: "steam_bot_repo",
        username: "postgres",
        password: "docker",
-       hostname: "localhost"
+       hostname: "postgres"
 
 
 # It is also possible to import configuration files, relative to this
