@@ -1,7 +1,9 @@
 version: '3.3'
 services:
   steam_bot:
-    build: rpi.Dockerfile
+    build:
+      context: .
+      dockerfile: rpi.Dockerfile
   postgres:
     image: postgres
     ports:
