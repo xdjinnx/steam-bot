@@ -1,4 +1,4 @@
-FROM bitwalker/alpine-elixir:1.9 as build
+FROM rpi-elixir as build
 
 RUN mkdir /app
 WORKDIR /app
