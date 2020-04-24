@@ -10,8 +10,9 @@ index [, <discord_id>]- Index your steam games manually"
   def add(), do: help()
 
   def add({:ok, guild_member}, steam_id) do
-    add_user = SteamBot.Steam.get_user(steam_id)
-    |> insert_user(guild_member.user)
+    add_user =
+      SteamBot.Steam.get_user(steam_id)
+      |> insert_user(guild_member.user)
 
     index({:ok, guild_member})
 
@@ -60,17 +61,21 @@ index [, <discord_id>]- Index your steam games manually"
   end
 
   defp filter_multiplayer({users, games}) do
-    games_with_tags = Enum.map(games, fn game -> game["appid"] end)
-    |> SteamBot.Query.get_games_with_tags()
+    games_with_tags =
+      Enum.map(games, fn game -> game["appid"] end)
+      |> SteamBot.Query.get_games_with_tags()
 
-    {users, Enum.filter(games, fn game ->
-      Enum.find(games_with_tags, fn game_with_tags -> game_with_tags.app_id == game["appid"] end)
-      |> is_multiplayer
-    end)}
+    {users,
+     Enum.filter(games, fn game ->
+       Enum.find(games_with_tags, fn game_with_tags -> game_with_tags.app_id == game["appid"] end)
+       |> is_multiplayer
+     end)}
   end
 
   defp is_multiplayer(nil), do: false
-  defp is_multiplayer(game), do: Enum.any?(game.categories, fn category -> category.category_id == 1 end)
+
+  defp is_multiplayer(game),
+    do: Enum.any?(game.categories, fn category -> category.category_id == 1 end)
 
   defp compare_games(users_games) do
     {_, games} = List.first(users_games)
