@@ -62,6 +62,8 @@ defmodule SteamBot.Application do
     run = Client.start(Application.get_env(:steam_bot, :discord_key))
     use Commands
 
+    Alchemy.Cogs.set_prefix(Application.get_env(:steam_bot, :call_prefix))
+
     children = [
       SteamBot.Repo,
       SteamBot.IndexQueue,
