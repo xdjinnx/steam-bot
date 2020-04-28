@@ -33,7 +33,10 @@ defmodule SteamBot.Query do
   end
 
   def insert_user(user) do
-    SteamBot.Repo.insert(user)
+    user
+    |> Ecto.Changeset.change
+    |> Ecto.Changeset.unique_constraint(:discord_id)
+    |> SteamBot.Repo.insert
   end
 
   def get_games(ids) do
