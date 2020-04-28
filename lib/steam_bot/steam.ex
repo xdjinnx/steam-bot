@@ -40,6 +40,10 @@ defmodule SteamBot.Steam do
     |> get_app_info(appid)
   end
 
+  defp get_app_info(:error, _) do
+    {:error, :tesla_error}
+  end
+
   defp get_app_info({:ok, response}, appid) do
     cond do
       response.body[Integer.to_string(appid)]["success"] ->
