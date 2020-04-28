@@ -32,12 +32,31 @@ defmodule SteamBot.Query do
     |> List.first()
   end
 
-  def insert_user(user) do
-    user
-    |> Ecto.Changeset.change
-    |> Ecto.Changeset.unique_constraint(:discord_id)
-    |> SteamBot.Repo.insert
+  def insert_or_update_user(user) do
+    Ecto.Multi.new()
+    |> Ecto.Multi.run(:get, fn repo, _changes ->
+      case repo.get_by(SteamBot.Schema.User, discord_id: user.discord_id) do
+        u -> {:ok,
+               u
+               |> Ecto.Changeset.change(%{
+                 discord_name: user.discord_name,
+                 steam_name: user.steam_name,
+                 steam_id: user.steam_id
+               })
+             }
+        nil -> {:ok, user}
+      end
+    end)
+    |> Ecto.Multi.insert_or_update(:update, fn %{get: u} ->
+      Ecto.Changeset.change(u)
+      |> Ecto.Changeset.unique_constraint(:discord_id)
+    end)
+    |> SteamBot.Repo.transaction()
+    |> get_inserted_user()
   end
+
+  defp get_inserted_user({:ok, %{update: u}}), do: {:ok, u}
+  defp get_inserted_user(error), do: error
 
   def get_games(ids) do
     query =

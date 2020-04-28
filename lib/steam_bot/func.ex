@@ -27,7 +27,7 @@ index [, <discord_id>]- Index your steam games manually"
 
   defp insert_user(steam_user, discord_user),
     do:
-      SteamBot.Query.insert_user(%SteamBot.Schema.User{
+      SteamBot.Query.insert_or_update_user(%SteamBot.Schema.User{
         discord_id: discord_user.id,
         discord_name: discord_user.username,
         steam_name: steam_user["personaname"],
