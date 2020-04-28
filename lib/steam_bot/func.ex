@@ -13,10 +13,8 @@ index [, <discord_id>]- Index your steam games manually"
     add_user =
       SteamBot.Steam.get_user(steam_id)
       |> insert_user(guild_member.user)
-
-    index({:ok, guild_member})
-
-    add_response(add_user)
+      |> index_new_user
+      |> add_response
   end
 
   def add({:ok, guild_id}, steam_id, discord_id) do
@@ -34,10 +32,19 @@ index [, <discord_id>]- Index your steam games manually"
         steam_id: steam_user["steamid"]
       })
 
+  defp index_new_user(({:ok, user})) do
+    try do
+      index(user.discord_id)
+      {:ok, user}
+    rescue
+        _ -> {:error, :index_error, user}
+      end
+  end
+
   defp add_response({:ok, user}),
     do: "#{user.discord_name} has been connected to steam user #{user.steam_name}!"
-
-  defp add_response({:error, _}), do: 'Something went wrong when writing to database'
+  defp add_response({:error, :index_error, user}), do: add_response({:ok, user}) <> ", problems with starting indexing"
+  defp add_response({:error, :database_error}), do: 'Something went wrong when writing to database'
 
   def compare({:ok, guild_member}, {:ok, guild_id}) do
     channel_id = SteamBot.Discord.get_current_voice_channel(guild_id, guild_member.user.id)

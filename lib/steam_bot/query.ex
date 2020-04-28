@@ -56,7 +56,7 @@ defmodule SteamBot.Query do
   end
 
   defp get_inserted_user({:ok, %{update: u}}), do: {:ok, u}
-  defp get_inserted_user(error), do: error
+  defp get_inserted_user({:error, _}), do: {:error, :database_error}
 
   def get_games(ids) do
     query =
