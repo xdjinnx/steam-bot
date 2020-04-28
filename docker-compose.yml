@@ -4,6 +4,7 @@ services:
     build:
       context: .
       dockerfile: rpi.Dockerfile
+      restart: always
   postgres:
     image: postgres
     ports:
