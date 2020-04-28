@@ -36,6 +36,7 @@ defmodule SteamBot.Query do
     Ecto.Multi.new()
     |> Ecto.Multi.run(:get, fn repo, _changes ->
       case repo.get_by(SteamBot.Schema.User, discord_id: user.discord_id) do
+        nil -> {:ok, user}
         u -> {:ok,
                u
                |> Ecto.Changeset.change(%{
@@ -44,7 +45,6 @@ defmodule SteamBot.Query do
                  steam_id: user.steam_id
                })
              }
-        nil -> {:ok, user}
       end
     end)
     |> Ecto.Multi.insert_or_update(:update, fn %{get: u} ->

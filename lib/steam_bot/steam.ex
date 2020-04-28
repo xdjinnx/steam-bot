@@ -17,7 +17,10 @@ defmodule SteamBot.Steam do
   defp get_first_user({:error, reason}), do: {:error, reason}
 
   defp get_first_user(body) do
-    List.first(body["response"]["players"])
+    case List.first(body["response"]["players"]) do
+      nil -> {:error, :not_found}
+      u -> u
+    end
   end
 
   def get_owned_games(steam_id) do
