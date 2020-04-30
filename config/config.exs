@@ -8,11 +8,5 @@ config :steam_bot, discord_key: "NzAyNzg3NzQxNTY5NTE1NjQx.XqNg6A.p5ddnFdp3X24bh1
 
 config :steam_bot, ecto_repos: [SteamBot.Repo]
 
-config :steam_bot, SteamBot.Repo,
-       database: "steam_bot_repo",
-       username: "postgres",
-       password: "docker",
-       hostname: "localhost"
-
 import_config "#{Mix.env()}.exs"
 

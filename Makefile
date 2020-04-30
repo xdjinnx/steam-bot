@@ -10,6 +10,9 @@ db-migrate:
 format:
 	mix format mix.exs "lib/**/*.{ex,exs}" "test/**/*.{ex,exs}"
 
+test:
+	mix test
+
 services-run:
 	docker run --rm --name pg-docker -e POSTGRES_PASSWORD=docker -d -p 5432:5432 -v ${HOME}/docker/volumes/postgres:/var/lib/postgresql/data postgres
 
