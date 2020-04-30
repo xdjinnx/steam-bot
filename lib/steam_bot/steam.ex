@@ -7,7 +7,7 @@ defmodule SteamBot.Steam do
   def steam_key(), do: Application.get_env(:steam_bot, :steam_key)
 
   def get_user(steam_id) do
-    SteamEx.ISteamUser.get_player_summaries(steam_key, %{
+    SteamEx.ISteamUser.get_player_summaries(steam_key(), %{
       "steamids" => steam_id
     })
     |> decode_body
@@ -24,7 +24,7 @@ defmodule SteamBot.Steam do
   end
 
   def get_owned_games(steam_id) do
-    SteamEx.IPlayerService.get_owned_games(steam_key, %{
+    SteamEx.IPlayerService.get_owned_games(steam_key(), %{
       "steamid" => steam_id,
       "include_appinfo" => true
     })

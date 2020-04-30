@@ -59,7 +59,7 @@ defmodule SteamBot.Application do
   end
 
   def start(_type, _args) do
-    run = Client.start(Application.get_env(:steam_bot, :discord_key))
+    Client.start(Application.get_env(:steam_bot, :discord_key))
     use Commands
 
     Alchemy.Cogs.set_prefix(Application.get_env(:steam_bot, :call_prefix))

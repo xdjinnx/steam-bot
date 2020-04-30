@@ -62,7 +62,7 @@ index [, <discord_id>]- Index your steam games manually"
     |> Enum.map(fn guild_member -> guild_member.user.id end)
     |> SteamBot.Query.get_users()
     |> Enum.map(fn user -> {user, SteamBot.Steam.get_owned_games(user.steam_id)} end)
-    |> Enum.filter(fn {user, games} -> !is_nil(games) end)
+    |> Enum.filter(fn {_, games} -> !is_nil(games) end)
     |> compare_games
     |> filter_multiplayer
     |> compare_response
@@ -132,7 +132,7 @@ index [, <discord_id>]- Index your steam games manually"
     SteamBot.Steam.get_owned_games(user.steam_id)
     |> Enum.map(fn game -> game["appid"] end)
     |> filter_need_indexing
-    |> Enum.reduce([], fn app_id, acc -> SteamBot.IndexQueue.push(app_id) end)
+    |> Enum.reduce([], fn app_id, _ -> SteamBot.IndexQueue.push(app_id) end)
 
     "I will index " <> user.discord_name <> "'s games!"
   end

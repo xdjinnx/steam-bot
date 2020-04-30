@@ -33,11 +33,11 @@ defmodule SteamBot.Indexer do
     end
   end
 
-  defp insert_game({:error, :invalid}, app_id) do
+  defp insert_game({:error, :invalid}, _) do
     IO.puts("Data is broken")
   end
 
-  defp insert_game({:error, _}, app_id) do
+  defp insert_game({:error, _}, _) do
     "We need to handle error somehow"
   end
 

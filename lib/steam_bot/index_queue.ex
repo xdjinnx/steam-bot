@@ -22,7 +22,7 @@ defmodule SteamBot.IndexQueue do
   end
 
   @impl true
-  def init(queue) do
+  def init(_) do
     {:ok, {:queue.new(), []}}
   end
 
@@ -32,7 +32,7 @@ defmodule SteamBot.IndexQueue do
   end
 
   @impl true
-  def handle_call(:pop, from, {queue, []}) do
+  def handle_call(:pop, _, {queue, []}) do
     {{:value, value}, q} = :queue.out(queue)
     {:reply, value, {q, []}}
   end
