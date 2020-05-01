@@ -6,25 +6,25 @@ defmodule SteamBot.Application do
     use Alchemy.Cogs
 
     Cogs.def steam do
-      SteamBot.Func.help() |> Cogs.say()
+      SteamBot.Handler.Help.help() |> Cogs.say()
     end
 
     Cogs.def steam(command) do
       case command do
         "add" ->
-          SteamBot.Func.add() |> Cogs.say()
+          SteamBot.Handler.Add.add() |> Cogs.say()
 
         "compare" ->
-          SteamBot.Func.compare(Cogs.member(), Cogs.guild_id()) |> Cogs.say()
+          SteamBot.Handler.Compare.compare(Cogs.member(), Cogs.guild_id()) |> Cogs.say()
 
         "discord-users" ->
-          SteamBot.Func.discord_users(Cogs.guild_id()) |> Cogs.say()
+          SteamBot.Handler.DiscordUsers.discord_users(Cogs.guild_id()) |> Cogs.say()
 
         "bot-users" ->
-          SteamBot.Func.bot_users() |> Cogs.say()
+          SteamBot.Handler.BotUsers.bot_users() |> Cogs.say()
 
         "index" ->
-          SteamBot.Func.index(Cogs.member()) |> Cogs.say()
+          SteamBot.Handler.Index.index(Cogs.member()) |> Cogs.say()
 
         _ ->
           Cogs.say("Command not found")
@@ -34,11 +34,11 @@ defmodule SteamBot.Application do
     Cogs.def steam(command, arg1) do
       case command do
         "add" ->
-          SteamBot.Func.add(Cogs.member(), arg1)
+          SteamBot.Handler.Add.add(Cogs.member(), arg1)
           |> Cogs.say()
 
         "index" ->
-          SteamBot.Func.index(arg1)
+          SteamBot.Handler.Index.index(arg1)
           |> Cogs.say()
 
         _ ->
@@ -49,7 +49,7 @@ defmodule SteamBot.Application do
     Cogs.def steam(command, arg1, arg2) do
       case command do
         "add" ->
-          SteamBot.Func.add(Cogs.guild_id(), arg1, arg2)
+          SteamBot.Handler.Add.add(Cogs.guild_id(), arg1, arg2)
           |> Cogs.say()
 
         _ ->
