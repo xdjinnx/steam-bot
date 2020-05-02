@@ -1,5 +1,5 @@
 defmodule SteamBot.Handler.Compare do
-  def compare({:ok, guild_member}, {:ok, guild_id}) do
+  def ask({:ok, guild_member}, {:ok, guild_id}) do
     channel_id = SteamBot.Discord.get_current_voice_channel(guild_id, guild_member.user.id)
 
     SteamBot.Discord.get_members_in_voice_channel(guild_id, channel_id)
@@ -9,10 +9,9 @@ defmodule SteamBot.Handler.Compare do
     |> Enum.filter(fn {_, games} -> !is_nil(games) end)
     |> compare_games
     |> filter_multiplayer
-    |> compare_response
   end
 
-  defp compare_response({users, games}) do
+  def interpret_response({users, games}) do
     owners = List.foldl(users, "", fn user, acc -> acc <> "<@#{user.discord_id}>, " end)
     in_common = List.foldl(games, "", fn game, acc -> acc <> game["name"] <> ", " end)
     count = Enum.count(games) |> Integer.to_string()

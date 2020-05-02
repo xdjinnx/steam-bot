@@ -12,19 +12,28 @@ defmodule SteamBot.Application do
     Cogs.def steam(command) do
       case command do
         "add" ->
-          SteamBot.Handler.Add.add() |> Cogs.say()
+          SteamBot.Handler.Add.ask()
+          |> Cogs.say()
 
         "compare" ->
-          SteamBot.Handler.Compare.compare(Cogs.member(), Cogs.guild_id()) |> Cogs.say()
+          SteamBot.Handler.Compare.ask(Cogs.member(), Cogs.guild_id())
+          |> SteamBot.Handler.Compare.interpret_response()
+          |> Cogs.say()
 
         "discord-users" ->
-          SteamBot.Handler.DiscordUsers.discord_users(Cogs.guild_id()) |> Cogs.say()
+          SteamBot.Handler.DiscordUsers.ask(Cogs.guild_id())
+          |> SteamBot.Handler.DiscordUsers.interpret_response()
+          |> Cogs.say()
 
         "bot-users" ->
-          SteamBot.Handler.BotUsers.bot_users() |> Cogs.say()
+          SteamBot.Handler.BotUsers.ask()
+          |> SteamBot.Handler.BotUsers.interpret_response()
+          |> Cogs.say()
 
         "index" ->
-          SteamBot.Handler.Index.index(Cogs.member()) |> Cogs.say()
+          SteamBot.Handler.Index.ask(Cogs.member())
+          |> SteamBot.Handler.Index.interpret_response()
+          |> Cogs.say()
 
         _ ->
           Cogs.say("Command not found")
@@ -34,11 +43,13 @@ defmodule SteamBot.Application do
     Cogs.def steam(command, arg1) do
       case command do
         "add" ->
-          SteamBot.Handler.Add.add(Cogs.member(), arg1)
+          SteamBot.Handler.Add.ask(Cogs.member(), arg1)
+          |> SteamBot.Handler.Add.interpret_response()
           |> Cogs.say()
 
         "index" ->
-          SteamBot.Handler.Index.index(arg1)
+          SteamBot.Handler.Index.ask(arg1)
+          |> SteamBot.Handler.Index.interpret_response()
           |> Cogs.say()
 
         _ ->
@@ -49,7 +60,8 @@ defmodule SteamBot.Application do
     Cogs.def steam(command, arg1, arg2) do
       case command do
         "add" ->
-          SteamBot.Handler.Add.add(Cogs.guild_id(), arg1, arg2)
+          SteamBot.Handler.Add.ask(Cogs.guild_id(), arg1, arg2)
+          |> SteamBot.Handler.Add.interpret_response()
           |> Cogs.say()
 
         _ ->

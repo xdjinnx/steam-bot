@@ -8,8 +8,6 @@ defmodule SteamBot.RepoCase do
       import Ecto
       import Ecto.Query
       import SteamBot.RepoCase
-
-      # and any other stuff
     end
   end
 

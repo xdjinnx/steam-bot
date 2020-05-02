@@ -1,17 +1,16 @@
 defmodule SteamBot.Handler.Add do
-  def add(), do: SteamBot.Handler.Help.help()
+  def ask(), do: SteamBot.Handler.Help.get_response()
 
-  def add({:ok, guild_member}, steam_id) do
+  def ask({:ok, guild_member}, steam_id) do
     SteamBot.Steam.get_user(steam_id)
     |> insert_user(guild_member.user)
     |> index_new_user
-    |> add_response
   end
 
-  def add({:ok, guild_id}, steam_id, discord_id) do
+  def ask({:ok, guild_id}, steam_id, discord_id) do
     guild_member = SteamBot.Discord.get_member(guild_id, discord_id)
 
-    add({:ok, guild_member}, steam_id)
+    ask({:ok, guild_member}, steam_id)
   end
 
   defp insert_user({:error, :not_found}, _), do: {:error, :steam_user_not_found}
@@ -36,14 +35,14 @@ defmodule SteamBot.Handler.Add do
 
   defp index_new_user(error), do: error
 
-  defp add_response({:ok, user}),
+  def interpret_response({:ok, user}),
        do: "#{user.discord_name} has been connected to steam user #{user.steam_name}!"
 
-  defp add_response({:error, :index_error, user}),
-       do: add_response({:ok, user}) <> ", problems with starting indexing"
+  def interpret_response({:error, :index_error, user}),
+       do: interpret_response({:ok, user}) <> ", problems with starting indexing"
 
-  defp add_response({:error, :database_error}),
+  def interpret_response({:error, :database_error}),
        do: 'Something went wrong when writing to database'
 
-  defp add_response({:error, :steam_user_not_found}), do: 'Steam user not found'
+  def interpret_response({:error, :steam_user_not_found}), do: 'Steam user not found'
 end
