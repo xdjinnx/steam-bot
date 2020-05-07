@@ -29,7 +29,7 @@ defmodule SteamBot.MixProject do
       {:jason, "~> 1.2"},
       {:tesla, "~> 1.3.0"},
       {:hackney, "~> 1.15.2"},
-      {:bypass, "~> 1.0", only: :test}
+      {:mox, "~> 0.5", only: :test}
     ]
   end
 
