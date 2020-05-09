@@ -23,16 +23,17 @@ defmodule AddTest do
       }
     end)
 
-    SteamBot.Handler.Add.ask(
-      {:ok,
-       %{
-         user: %{
-           id: "random_discord_id",
-           username: "random_discord_name"
-         }
-       }},
-      456_765_456
-    )
+    {:ok, _} =
+      SteamBot.Handler.Add.ask(
+        {:ok,
+         %{
+           user: %{
+             id: "random_discord_id",
+             username: "random_discord_name"
+           }
+         }},
+        456_765_456
+      )
 
     user = List.first(SteamBot.Query.get_all_users())
 

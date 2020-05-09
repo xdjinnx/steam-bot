@@ -8,3 +8,4 @@ config :steam_bot, SteamBot.Repo,
        pool: Ecto.Adapters.SQL.Sandbox
 
 config :steam_bot, steam_api: SteamBot.SteamMock
+config :steam_bot, discord_api: SteamBot.DiscordMock

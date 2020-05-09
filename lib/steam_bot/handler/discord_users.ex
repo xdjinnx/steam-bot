@@ -1,6 +1,6 @@
 defmodule SteamBot.Handler.DiscordUsers do
   def ask({:ok, guild_id}) do
-    SteamBot.Discord.get_members(guild_id)
+    SteamBot.Discord.API.get_members(guild_id)
   end
 
   def interpret_response(guild_members) do

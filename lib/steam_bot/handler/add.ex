@@ -5,14 +5,13 @@ defmodule SteamBot.Handler.Add do
   def ask(), do: SteamBot.Handler.Help.get_response()
 
   def ask({:ok, guild_member}, steam_id) do
-    steam_api.get_user(steam_id)
-    |> IO.inspect()
+    steam_api().get_user(steam_id)
     |> insert_user(guild_member.user)
     |> index_new_user
   end
 
   def ask({:ok, guild_id}, steam_id, discord_id) do
-    guild_member = SteamBot.Discord.get_member(guild_id, discord_id)
+    guild_member = SteamBot.Discord.API.get_member(guild_id, discord_id)
 
     ask({:ok, guild_member}, steam_id)
   end
@@ -30,7 +29,7 @@ defmodule SteamBot.Handler.Add do
 
   defp index_new_user({:ok, user}) do
     try do
-      SteamBot.Handler.Index.index(user.discord_id)
+      SteamBot.Handler.Index.ask(user.discord_id)
       {:ok, user}
     rescue
       _ -> {:error, :index_error, user}

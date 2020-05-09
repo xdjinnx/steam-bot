@@ -6,7 +6,7 @@ defmodule SteamBot.Application do
     use Alchemy.Cogs
 
     Cogs.def steam do
-      SteamBot.Handler.Help.help() |> Cogs.say()
+      SteamBot.Handler.Help.get_response() |> Cogs.say()
     end
 
     Cogs.def steam(command) do

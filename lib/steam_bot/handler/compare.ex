@@ -1,8 +1,10 @@
 defmodule SteamBot.Handler.Compare do
-  def ask({:ok, guild_member}, {:ok, guild_id}) do
-    channel_id = SteamBot.Discord.get_current_voice_channel(guild_id, guild_member.user.id)
+  def discord_api, do: Application.get_env(:steam_bot, :discord_api, SteamBot.Discord.API)
 
-    SteamBot.Discord.get_members_in_voice_channel(guild_id, channel_id)
+  def ask({:ok, guild_member}, {:ok, guild_id}) do
+    channel_id = discord_api.get_current_voice_channel(guild_id, guild_member.user.id)
+
+    discord_api.get_members_in_voice_channel(guild_id, channel_id)
     |> Enum.map(fn guild_member -> guild_member.user.id end)
     |> SteamBot.Query.get_users()
     |> Enum.map(fn user -> {user, SteamBot.Steam.API.get_owned_games(user.steam_id)} end)

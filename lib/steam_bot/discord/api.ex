@@ -1,4 +1,4 @@
-defmodule SteamBot.Discord do
+defmodule SteamBot.Discord.API do
   alias Alchemy.Client
   alias Alchemy.Cache
 
