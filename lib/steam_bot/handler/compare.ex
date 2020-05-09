@@ -5,7 +5,7 @@ defmodule SteamBot.Handler.Compare do
     SteamBot.Discord.get_members_in_voice_channel(guild_id, channel_id)
     |> Enum.map(fn guild_member -> guild_member.user.id end)
     |> SteamBot.Query.get_users()
-    |> Enum.map(fn user -> {user, SteamBot.Steam.get_owned_games(user.steam_id)} end)
+    |> Enum.map(fn user -> {user, SteamBot.Steam.API.get_owned_games(user.steam_id)} end)
     |> Enum.filter(fn {_, games} -> !is_nil(games) end)
     |> compare_games
     |> filter_multiplayer
@@ -25,16 +25,16 @@ defmodule SteamBot.Handler.Compare do
       |> SteamBot.Query.get_games_with_tags()
 
     {users,
-      Enum.filter(games, fn game ->
-        Enum.find(games_with_tags, fn game_with_tags -> game_with_tags.app_id == game["appid"] end)
-        |> is_multiplayer
-      end)}
+     Enum.filter(games, fn game ->
+       Enum.find(games_with_tags, fn game_with_tags -> game_with_tags.app_id == game["appid"] end)
+       |> is_multiplayer
+     end)}
   end
 
   defp is_multiplayer(nil), do: false
 
   defp is_multiplayer(game),
-       do: Enum.any?(game.categories, fn category -> category.category_id == 1 end)
+    do: Enum.any?(game.categories, fn category -> category.category_id == 1 end)
 
   defp compare_games(users_games) do
     {_, games} = List.first(users_games)

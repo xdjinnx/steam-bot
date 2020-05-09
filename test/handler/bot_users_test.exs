@@ -5,13 +5,14 @@ defmodule BotUsersTest do
   test "returns users from database" do
     SteamBot.Repo.insert(get_user())
 
-     users = SteamBot.Handler.BotUsers.ask()
-     assert Enum.count(users) == 1
+    users = SteamBot.Handler.BotUsers.ask()
+    assert Enum.count(users) == 1
   end
 
   test "parse users list correctly" do
-    string_length = SteamBot.Handler.BotUsers.interpret_response([get_user()])
-    |> String.length()
+    string_length =
+      SteamBot.Handler.BotUsers.interpret_response([get_user()])
+      |> String.length()
 
     assert string_length > 0
   end

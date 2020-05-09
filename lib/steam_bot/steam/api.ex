@@ -1,5 +1,7 @@
-defmodule SteamBot.Steam do
+defmodule SteamBot.Steam.API do
   use Tesla
+
+  @behaviour SteamBot.Steam
 
   plug(Tesla.Middleware.BaseUrl, "https://api.github.com")
   plug(Tesla.Middleware.JSON)

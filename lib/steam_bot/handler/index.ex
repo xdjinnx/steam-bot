@@ -6,7 +6,7 @@ defmodule SteamBot.Handler.Index do
   def ask(discord_id) do
     user = SteamBot.Query.get_user(discord_id)
 
-    SteamBot.Steam.get_owned_games(user.steam_id)
+    SteamBot.Steam.API.get_owned_games(user.steam_id)
     |> Enum.map(fn game -> game["appid"] end)
     |> filter_need_indexing
     |> Enum.reduce([], fn app_id, _ -> SteamBot.IndexQueue.push(app_id) end)
