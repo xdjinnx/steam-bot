@@ -16,14 +16,14 @@ defmodule AddTest do
 
   test "can add a user" do
     SteamBot.SteamMock
-    |> expect(:get_user, fn x ->
+    |> expect(:get_user, fn _ ->
       %{
         "steamid" => "random_steam_id",
         "personaname" => "random_steam_name"
       }
     end)
 
-    {:ok, _} =
+    {:error, :index_error, _} =
       SteamBot.Handler.Add.ask(
         {:ok,
          %{

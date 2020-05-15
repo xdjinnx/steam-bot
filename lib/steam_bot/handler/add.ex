@@ -1,5 +1,4 @@
 defmodule SteamBot.Handler.Add do
-  # DI
   def steam_api, do: Application.get_env(:steam_bot, :steam_api, SteamBot.Steam.API)
 
   def ask(), do: SteamBot.Handler.Help.get_response()
