@@ -1,4 +1,4 @@
-defmodule CompareTest do
+defmodule Handler.CompareTest do
   use SteamBot.RepoCase
   use ExUnit.Case
 

@@ -1,4 +1,4 @@
-defmodule BotUsersTest do
+defmodule Handler.BotUsersTest do
   use SteamBot.RepoCase
   use ExUnit.Case
 

@@ -1,4 +1,4 @@
-defmodule SteamBot.IndexQueue do
+defmodule SteamBot.GameIndex.IndexQueue do
   use GenServer
 
   def start_link(no_arg) when is_list(no_arg) do

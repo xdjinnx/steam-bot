@@ -78,8 +78,8 @@ defmodule SteamBot.Application do
 
     children = [
       SteamBot.Repo,
-      SteamBot.IndexQueue,
-      SteamBot.Indexer
+      SteamBot.GameIndex.IndexQueue,
+      SteamBot.GameIndex.Indexer
     ]
 
     opts = [strategy: :one_for_one, name: SteamBot.Supervisor]

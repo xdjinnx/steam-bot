@@ -1,4 +1,4 @@
-defmodule DiscordUsersTest do
+defmodule Handler.DiscordUsersTest do
   use SteamBot.RepoCase
   use ExUnit.Case
 

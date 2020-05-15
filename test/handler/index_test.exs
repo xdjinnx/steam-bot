@@ -1,4 +1,4 @@
-defmodule IndexTest do
+defmodule Handler.IndexTest do
   use SteamBot.RepoCase
   use ExUnit.Case
 

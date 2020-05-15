@@ -11,7 +11,7 @@ defmodule SteamBot.Handler.Index do
     steam_api().get_owned_games(user.steam_id)
     |> Enum.map(fn game -> game["appid"] end)
     |> filter_need_indexing
-    |> Enum.reduce([], fn app_id, _ -> SteamBot.IndexQueue.push(app_id) end)
+    |> Enum.reduce([], fn app_id, _ -> SteamBot.GameIndex.IndexQueue.push(app_id) end)
 
     user
   end

@@ -1,6 +1,6 @@
 children = [
   SteamBot.Repo,
-  SteamBot.IndexQueue,
+  SteamBot.GameIndex.IndexQueue,
   Mox.Server
 ]
 
