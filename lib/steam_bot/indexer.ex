@@ -1,6 +1,8 @@
 defmodule SteamBot.Indexer do
   use Task, restart: :permanent
 
+  def steam_api, do: Application.get_env(:steam_bot, :steam_api, SteamBot.Steam.API)
+
   def start_link(no_arg) do
     Task.start_link(__MODULE__, :run, [no_arg])
   end
@@ -17,7 +19,7 @@ defmodule SteamBot.Indexer do
   defp index_game([], app_id) do
     Process.sleep(1000)
 
-    SteamBot.Steam.get_app_info(app_id)
+    steam_api().get_app_info(app_id)
     |> validate_game_data()
     |> insert_game(app_id)
   end
