@@ -34,10 +34,10 @@ defmodule Handler.IndexTest do
   end
 
   def get_user(),
-      do: %SteamBot.Schema.User{
-        steam_id: "123",
-        discord_id: "123",
-        steam_name: "steam_name",
-        discord_name: "discord_name"
-      }
+    do: %SteamBot.Schema.User{
+      steam_id: "123",
+      discord_id: "123",
+      steam_name: "steam_name",
+      discord_name: "discord_name"
+    }
 end

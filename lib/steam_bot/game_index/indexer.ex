@@ -22,13 +22,13 @@ defmodule SteamBot.GameIndex.Indexer do
     game
   end
 
-  defp index_game([], app_id) do
+  def index_game([], app_id) do
     steam_api().get_app_info(app_id)
     |> validate_game_data()
     |> insert_game(app_id)
   end
 
-  defp index_game(_, _), do: :ok
+  def index_game(_, _), do: :ok
 
   defp validate_game_data({:error, r}), do: {:error, r}
 
