@@ -1,4 +1,6 @@
 defmodule SteamBot.Handler.Index do
+  def steam_api, do: Application.get_env(:steam_bot, :steam_api, SteamBot.Steam.API)
+
   def ask({:ok, guild_member}) do
     ask(guild_member.user.id)
   end
@@ -6,7 +8,7 @@ defmodule SteamBot.Handler.Index do
   def ask(discord_id) do
     user = SteamBot.Query.get_user(discord_id)
 
-    SteamBot.Steam.API.get_owned_games(user.steam_id)
+    steam_api().get_owned_games(user.steam_id)
     |> Enum.map(fn game -> game["appid"] end)
     |> filter_need_indexing
     |> Enum.reduce([], fn app_id, _ -> SteamBot.IndexQueue.push(app_id) end)
@@ -17,6 +19,8 @@ defmodule SteamBot.Handler.Index do
   def interpret_response(user) do
     "I will index " <> user.discord_name <> "'s games!"
   end
+
+  defp filter_need_indexing([]), do: []
 
   defp filter_need_indexing(app_ids) do
     indexed_games = SteamBot.Query.get_games(app_ids)

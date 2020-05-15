@@ -23,7 +23,12 @@ defmodule AddTest do
       }
     end)
 
-    {:error, :index_error, _} =
+    SteamBot.SteamMock
+    |> expect(:get_owned_games, fn _ ->
+      []
+    end)
+
+    {:ok, _} =
       SteamBot.Handler.Add.ask(
         {:ok,
          %{
