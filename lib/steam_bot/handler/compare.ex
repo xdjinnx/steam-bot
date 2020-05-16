@@ -40,17 +40,41 @@ defmodule SteamBot.Handler.Compare do
     do: Enum.any?(game.categories, fn category -> category.category_id == 1 end)
 
   defp compare_games(users_games) do
-    {_, games} = List.first(users_games)
-
     {
       List.foldl(users_games, [], fn {user, _}, acc -> [user | acc] end),
-      List.foldl(users_games, games, fn {_, games}, acc ->
-        Enum.filter(acc, fn game -> is_game_in_list?(games, game) end)
-      end)
+      get_list_of_all_games(users_games)
+      |> get_compare_map(users_games)
+      |> get_games_owned_by_all(users_games)
     }
+  end
+
+  defp get_list_of_all_games(users_games) do
+    Enum.reduce(users_games, [], fn {_, games}, acc -> Enum.concat(acc, games) end)
+    |> Enum.dedup_by(fn %{"appid" => id} -> id end)
+  end
+
+  defp get_compare_map(games, users_games) do
+    Enum.reduce(games, %{}, fn game, acc ->
+      owners_count = count_owners(game, users_games)
+      Map.put(acc, owners_count, [game | Map.get(acc, owners_count, [])])
+    end)
+  end
+
+  defp count_owners(game, users_games) do
+    Enum.reduce(users_games, 0, fn {_, games}, acc ->
+      case is_game_in_list?(games, game) do
+        true -> acc + 1
+        false -> acc
+      end
+    end)
   end
 
   defp is_game_in_list?(games, game) do
     Enum.any?(games, fn games_game -> games_game["appid"] == game["appid"] end)
+  end
+
+  defp get_games_owned_by_all(compare_map, users_games) do
+    user_count = List.foldl(users_games, [], fn {user, _}, acc -> [user | acc] end) |> Enum.count()
+    Map.get(compare_map, user_count, [])
   end
 end
