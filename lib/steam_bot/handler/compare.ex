@@ -5,6 +5,16 @@ defmodule SteamBot.Handler.Compare do
   def ask({:ok, guild_member}, {:ok, guild_id}) do
     channel_id = discord_api().get_current_voice_channel(guild_id, guild_member.user.id)
 
+    {users, compare_map} = get_users_games(guild_id, channel_id)
+
+    {
+      users,
+      Map.get(compare_map, Enum.count(users), []),
+      get_recommended_games(users, compare_map)
+    }
+  end
+
+  defp get_users_games(guild_id, channel_id) do
     discord_api().get_members_in_voice_channel(guild_id, channel_id)
     |> Enum.map(fn guild_member -> guild_member.user.id end)
     |> SteamBot.Query.get_users()
@@ -14,30 +24,25 @@ defmodule SteamBot.Handler.Compare do
     |> filter_multiplayer
   end
 
-  def interpret_response({users, compare_map}) do
-    games = Map.get(compare_map, Enum.count(users), [])
-    owners = List.foldl(users, "", fn user, acc -> acc <> "<@#{user.discord_id}>, " end)
-    in_common = List.foldl(games, "", fn game, acc -> acc <> game["name"] <> ", " end)
-    count = Enum.count(games) |> Integer.to_string()
-
-    owners <> " have " <> count <> " games in common: " <> in_common
-  end
-
   defp filter_multiplayer({users, compare_map}) do
-    games_with_tags = Enum.reduce(1..Enum.count(users), [], fn i, acc ->
-      Map.get(compare_map, i, [])
-      |> Enum.map(fn game -> game["appid"] end)
-      |> SteamBot.Query.get_games_with_tags()
-      |> Enum.concat(acc)
-    end)
+    games_with_tags =
+      Enum.reduce(1..Enum.count(users), [], fn i, acc ->
+        Map.get(compare_map, i, [])
+        |> Enum.map(fn game -> game["appid"] end)
+        |> SteamBot.Query.get_games_with_tags()
+        |> Enum.concat(acc)
+      end)
 
     {users,
      Enum.reduce(1..Enum.count(users), %{}, fn i, acc ->
-       multiplayer_games = Map.get(compare_map, i, [])
-       |> Enum.filter(fn game ->
-         Enum.find(games_with_tags, fn game_with_tags -> game_with_tags.app_id == game["appid"] end)
-         |> is_multiplayer
-       end)
+       multiplayer_games =
+         Map.get(compare_map, i, [])
+         |> Enum.filter(fn game ->
+           Enum.find(games_with_tags, fn game_with_tags ->
+             game_with_tags.app_id == game["appid"]
+           end)
+           |> is_multiplayer
+         end)
 
        Map.put(acc, i, multiplayer_games)
      end)}
@@ -79,5 +84,32 @@ defmodule SteamBot.Handler.Compare do
 
   defp is_game_in_list?(games, game) do
     Enum.any?(games, fn games_game -> games_game["appid"] == game["appid"] end)
+  end
+
+  defp get_recommended_games(users, compare_map) do
+    game =
+      Map.get(compare_map, Enum.count(users) - 1, [])
+      |> Enum.shuffle()
+      |> List.first()
+
+    case game do
+      nil -> []
+      _ -> [game]
+    end
+  end
+
+  def interpret_response({users, all_owned_games, recommended_games}) do
+    owners = List.foldl(users, "", fn user, acc -> acc <> "<@#{user.discord_id}>, " end)
+    in_common = List.foldl(all_owned_games, "", fn game, acc -> acc <> game["name"] <> ", " end)
+    count = Enum.count(all_owned_games) |> Integer.to_string()
+    first_recommended_game = List.first(recommended_games)
+
+    recommended_game =
+      case first_recommended_game do
+        nil -> ""
+        _ -> "**One person is missing** " <> first_recommended_game["name"] <> ", but "
+      end
+
+    recommended_game <> owners <> " have " <> count <> " games in common: " <> in_common
   end
 end

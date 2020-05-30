@@ -28,11 +28,14 @@ defmodule Handler.CompareTest do
       ]
     end)
 
-    {users, compare_map} = SteamBot.Handler.Compare.ask({:ok, %{user: %{id: "123"}}}, {:ok, "123"})
+    {users, games, recommended_games} =
+      SteamBot.Handler.Compare.ask({:ok, %{user: %{id: "123"}}}, {:ok, "123"})
+
     assert Enum.count(users) == 1
     assert List.first(users).discord_name == "discord_name"
-    assert Enum.count(compare_map[1]) == 1
-    assert List.first(compare_map[1])["name"] == "Test game"
+    assert Enum.count(games) == 1
+    assert List.first(games)["name"] == "Test game"
+    assert Enum.count(recommended_games) == 0
   end
 
   def get_user(),
