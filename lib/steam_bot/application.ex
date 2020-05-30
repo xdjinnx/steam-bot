@@ -52,6 +52,10 @@ defmodule SteamBot.Application do
           |> SteamBot.Handler.Index.interpret_response()
           |> Cogs.say()
 
+        "search" ->
+          SteamBot.Handler.Search.ask(arg1)
+          |> SteamBot.Handler.Search.interpret_response()
+          |> Cogs.say()
         _ ->
           Cogs.say("Command not found")
       end
