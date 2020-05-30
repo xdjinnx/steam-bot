@@ -19,6 +19,9 @@ services-run:
 services-stop:
 	docker stop pg-docker
 
+rpi-build-deploy:
+	docker build -t steam_bot -f rpi.Dockerfile .
+
 rpi-deploy:
 	docker-compose up -d
 
