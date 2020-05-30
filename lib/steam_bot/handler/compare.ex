@@ -63,7 +63,7 @@ defmodule SteamBot.Handler.Compare do
 
   defp get_list_of_all_games(users_games) do
     Enum.reduce(users_games, [], fn {_, games}, acc -> Enum.concat(acc, games) end)
-    |> Enum.dedup_by(fn %{"appid" => id} -> id end)
+    |> Enum.uniq_by(fn %{"appid" => id} -> id end)
   end
 
   defp get_compare_map(games, users_games) do
@@ -107,9 +107,9 @@ defmodule SteamBot.Handler.Compare do
     recommended_game =
       case first_recommended_game do
         nil -> ""
-        _ -> "**One person is missing** " <> first_recommended_game["name"] <> ", but "
+        _ -> "**One person is missing** " <> first_recommended_game["name"] <> ", **but** "
       end
 
-    recommended_game <> owners <> " have " <> count <> " games in common: " <> in_common
+    recommended_game <> owners <> " **have** " <> count <> " **games in common:** " <> in_common
   end
 end
