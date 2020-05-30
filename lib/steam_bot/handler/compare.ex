@@ -14,7 +14,8 @@ defmodule SteamBot.Handler.Compare do
     |> filter_multiplayer
   end
 
-  def interpret_response({users, games}) do
+  def interpret_response({users, compare_map}) do
+    games = Map.get(compare_map, Enum.count(users), [])
     owners = List.foldl(users, "", fn user, acc -> acc <> "<@#{user.discord_id}>, " end)
     in_common = List.foldl(games, "", fn game, acc -> acc <> game["name"] <> ", " end)
     count = Enum.count(games) |> Integer.to_string()
@@ -22,15 +23,23 @@ defmodule SteamBot.Handler.Compare do
     owners <> " have " <> count <> " games in common: " <> in_common
   end
 
-  defp filter_multiplayer({users, games}) do
-    games_with_tags =
-      Enum.map(games, fn game -> game["appid"] end)
+  defp filter_multiplayer({users, compare_map}) do
+    games_with_tags = Enum.reduce(1..Enum.count(users), [], fn i, acc ->
+      Map.get(compare_map, i, [])
+      |> Enum.map(fn game -> game["appid"] end)
       |> SteamBot.Query.get_games_with_tags()
+      |> Enum.concat(acc)
+    end)
 
     {users,
-     Enum.filter(games, fn game ->
-       Enum.find(games_with_tags, fn game_with_tags -> game_with_tags.app_id == game["appid"] end)
-       |> is_multiplayer
+     Enum.reduce(1..Enum.count(users), %{}, fn i, acc ->
+       multiplayer_games = Map.get(compare_map, i, [])
+       |> Enum.filter(fn game ->
+         Enum.find(games_with_tags, fn game_with_tags -> game_with_tags.app_id == game["appid"] end)
+         |> is_multiplayer
+       end)
+
+       Map.put(acc, i, multiplayer_games)
      end)}
   end
 
@@ -44,7 +53,6 @@ defmodule SteamBot.Handler.Compare do
       List.foldl(users_games, [], fn {user, _}, acc -> [user | acc] end),
       get_list_of_all_games(users_games)
       |> get_compare_map(users_games)
-      |> get_games_owned_by_all(users_games)
     }
   end
 
@@ -71,10 +79,5 @@ defmodule SteamBot.Handler.Compare do
 
   defp is_game_in_list?(games, game) do
     Enum.any?(games, fn games_game -> games_game["appid"] == game["appid"] end)
-  end
-
-  defp get_games_owned_by_all(compare_map, users_games) do
-    user_count = List.foldl(users_games, [], fn {user, _}, acc -> [user | acc] end) |> Enum.count()
-    Map.get(compare_map, user_count, [])
   end
 end
